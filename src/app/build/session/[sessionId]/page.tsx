@@ -170,8 +170,8 @@ export default function SessionPage() {
   if (!avatar) return null
 
   const showReviewButton = interviewStage === 'review'
-  // Only show Tavus when explicitly enabled via env var (requires valid Tavus API key)
-  const showTavus = false // Tavus disabled — using GenerativeAvatar instead
+  // Tavus enabled by default — falls back to GenerativeAvatar if API returns 503
+  const showTavus = true
 
   return (
     <>

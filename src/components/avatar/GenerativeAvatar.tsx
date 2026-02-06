@@ -75,8 +75,8 @@ export function GenerativeAvatar({ avatar, onConnected, onError, onSpeak }: Gene
         if (timedOut) return // Check again after constructor
 
         await head.showAvatar({
-          url: 'https://models.readyplayer.me/6460d95f9ae8cb350c14e7d4.glb',
-          body: 'F',
+          url: avatar.modelUrl || 'https://models.readyplayer.me/6460d95f9ae8cb350c14e7d4.glb?morphTargets=ARKit,Oculus+Visemes',
+          body: avatar.modelBody || 'F',
           avatarMood: 'neutral',
           lipsyncLang: 'en',
         })
@@ -90,7 +90,7 @@ export function GenerativeAvatar({ avatar, onConnected, onError, onSpeak }: Gene
         // Expose speak function to parent
         const speakFn = (text: string) => {
           if (text.trim()) {
-            head.speakText(text, { lipsyncLang: 'en' })
+            head.speakText(text, { lipsyncLang: 'en', avatarMute: true })
           }
         }
         onSpeakRef.current?.(speakFn)

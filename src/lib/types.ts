@@ -59,6 +59,10 @@ export interface AvatarPersonality {
   gradient: string
   senderColor: string
   voiceId?: string
+  /** Ready Player Me GLB URL (with morphTargets query param) */
+  modelUrl?: string
+  /** Body type for TalkingHead: 'M' or 'F' */
+  modelBody?: string
   tavusReplicaId?: string
   tavusPersonaId?: string
 }

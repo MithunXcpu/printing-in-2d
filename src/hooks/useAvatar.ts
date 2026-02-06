@@ -15,10 +15,11 @@ type TalkingHeadInstance = {
   [key: string]: unknown
 }
 
-const DEFAULT_AVATAR_URL = 'https://models.readyplayer.me/6460d95f9ae8cb350c14e7d4.glb'
+const DEFAULT_AVATAR_URL = 'https://models.readyplayer.me/6460d95f9ae8cb350c14e7d4.glb?morphTargets=ARKit,Oculus+Visemes'
 
 interface UseAvatarOptions {
   avatarUrl?: string
+  avatarBody?: string
   onSpeakingStart?: () => void
   onSpeakingEnd?: () => void
 }
@@ -64,7 +65,7 @@ export function useAvatar(options: UseAvatarOptions = {}) {
 
       await head.showAvatar({
         url: options.avatarUrl || DEFAULT_AVATAR_URL,
-        body: 'F',
+        body: options.avatarBody || 'F',
         avatarMood: 'neutral',
         lipsyncLang: 'en',
       })
@@ -89,11 +90,11 @@ export function useAvatar(options: UseAvatarOptions = {}) {
     } finally {
       setIsLoading(false)
     }
-  }, [options.avatarUrl, options.onSpeakingStart, options.onSpeakingEnd])
+  }, [options.avatarUrl, options.avatarBody, options.onSpeakingStart, options.onSpeakingEnd])
 
   const speak = useCallback((text: string) => {
     if (!headRef.current || !text.trim()) return
-    headRef.current.speakText(text, { lipsyncLang: 'en' })
+    headRef.current.speakText(text, { lipsyncLang: 'en', avatarMute: true })
   }, [])
 
   const stopSpeaking = useCallback(() => {

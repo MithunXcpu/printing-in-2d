@@ -34,6 +34,8 @@ export interface Message {
   id: string
   role: 'user' | 'assistant' | 'system'
   content: string
+  /** Base64 data URL for an attached screenshot/image */
+  imageUrl?: string
   toolCalls?: ToolCall[]
   timestamp: number
 }
@@ -74,7 +76,9 @@ export interface WorkOrder {
 }
 
 export interface UserProfile {
+  name?: string
   role?: string
+  industry?: string
   department?: string
   companyContext?: string
   desiredOutcomes: string[]
@@ -82,3 +86,12 @@ export interface UserProfile {
   currentTools: string[]
   dataSources: string[]
 }
+
+export type SessionPhase = 'selection' | 'discover' | 'design' | 'blueprint' | 'build' | 'validate'
+
+export const PHASE_CONFIG: { key: SessionPhase; label: string; subtitle: string }[] = [
+  { key: 'discover', label: 'DISCOVER', subtitle: 'Tell us about you' },
+  { key: 'design', label: 'DESIGN', subtitle: 'Build your workflow' },
+  { key: 'blueprint', label: 'BLUEPRINT', subtitle: 'Review your plan' },
+  { key: 'build', label: 'BUILD', subtitle: 'Generate build plan' },
+]

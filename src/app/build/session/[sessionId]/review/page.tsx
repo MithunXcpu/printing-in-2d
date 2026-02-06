@@ -1,5 +1,6 @@
 'use client'
 
+import { useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { TopBar } from '@/components/layout/TopBar'
 import { useSessionStore } from '@/stores/session.store'
@@ -13,11 +14,17 @@ export default function ReviewPage() {
   const router = useRouter()
   const avatarKey = useSessionStore((s) => s.avatarKey)
   const sessionId = useSessionStore((s) => s.sessionId)
+  const setPhase = useSessionStore((s) => s.setPhase)
   const nodes = useWorkflowStore((s) => s.nodes)
   const connections = useWorkflowStore((s) => s.connections)
   const messages = useConversationStore((s) => s.messages)
 
   const avatar = avatarKey ? AVATAR_PERSONALITIES[avatarKey] : null
+
+  // Set phase on mount
+  useEffect(() => {
+    setPhase('blueprint')
+  }, [setPhase])
 
   if (!avatar) {
     router.push('/build')
@@ -34,9 +41,11 @@ export default function ReviewPage() {
   return (
     <>
       <TopBar
-        status="Review your workflow"
+        status="Blueprint"
         showBack
         onBack={() => router.push(`/build/session/${sessionId}`)}
+        showPhases
+        avatarColor={avatar.color}
       />
       <main className="pt-14 min-h-screen flex flex-col">
         {/* Top section */}
@@ -63,7 +72,7 @@ export default function ReviewPage() {
             >
               &#x2713;
             </div>
-            Workflow mapped
+            Blueprint ready
           </div>
           <h2
             className="mb-2.5 relative"
@@ -73,7 +82,7 @@ export default function ReviewPage() {
               letterSpacing: '-0.02em',
             }}
           >
-            Your workflow is <em className="italic font-light" style={{ color: avatar.senderColor }}>ready.</em>
+            Your micro tool blueprint is <em className="italic font-light" style={{ color: avatar.senderColor }}>ready.</em>
           </h2>
           <p
             className="font-light max-w-[500px] mx-auto leading-[1.6] relative"
@@ -208,7 +217,7 @@ export default function ReviewPage() {
                   <path d="M8 1v10M4 7l4 4 4-4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
                   <path d="M2 13h12" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
                 </svg>
-                Generate Work Orders
+                Generate Build Plan
               </button>
               <button
                 onClick={() => router.push(`/build/session/${sessionId}`)}

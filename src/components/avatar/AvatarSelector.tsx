@@ -22,7 +22,7 @@ export function AvatarSelector({ onSelect }: AvatarSelectorProps) {
             color: 'var(--green-400)',
           }}
         >
-          01 — Choose your guide
+          Step 1 of 5 — Choose your guide
         </div>
         <h1
           className="mb-3"
@@ -32,17 +32,16 @@ export function AvatarSelector({ onSelect }: AvatarSelectorProps) {
             letterSpacing: '-0.03em',
           }}
         >
-          Pick a mind.
-          <br />
+          Who should{' '}
           <em className="italic font-light" style={{ color: 'var(--green-300)' }}>
-            Start building.
+            build with you?
           </em>
         </h1>
         <p
-          className="font-light mx-auto leading-[1.6] max-w-[440px]"
+          className="font-light mx-auto leading-[1.6] max-w-[480px]"
           style={{ fontSize: '1.05rem', color: 'var(--ink-20)' }}
         >
-          Each avatar brings a different personality to your workflow. Same power, different approach.
+          Each avatar has a different approach to understanding your problem and designing your micro tool.
         </p>
       </div>
 

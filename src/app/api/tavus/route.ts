@@ -31,7 +31,7 @@ export async function POST(request: Request) {
         // Enable conversational mode
         properties: {
           max_call_duration: 1800, // 30 minutes max
-          enable_recording: false,
+          enable_recording: true,
           language: 'english',
         },
       }),

@@ -14,8 +14,8 @@ export const AVATAR_PERSONALITIES: Record<string, AvatarPersonality> = {
     senderColor: '#5cb83a',
     // ElevenLabs: "Adam" — deep, authoritative male voice
     voiceId: 'pNInz6obpgDQGcFmaJgB',
-    // Tavus: configure with your replica IDs
-    tavusReplicaId: undefined,
+    // Tavus: James — professional, authoritative male
+    tavusReplicaId: 'r92debe21318',
     tavusPersonaId: undefined,
   },
   spark: {
@@ -31,7 +31,8 @@ export const AVATAR_PERSONALITIES: Record<string, AvatarPersonality> = {
     senderColor: '#f59e0b',
     // ElevenLabs: "Josh" — energetic, youthful voice
     voiceId: 'TxGEqnHWrfWFTfGW9XjX',
-    tavusReplicaId: undefined,
+    // Tavus: Luna — creative, energetic female
+    tavusReplicaId: 'r9d30b0e55ac',
     tavusPersonaId: undefined,
   },
   forge: {
@@ -47,7 +48,8 @@ export const AVATAR_PERSONALITIES: Record<string, AvatarPersonality> = {
     senderColor: '#818cf8',
     // ElevenLabs: "Arnold" — sharp, direct voice
     voiceId: 'VR6AewLTigWG4xSOukaG',
-    tavusReplicaId: undefined,
+    // Tavus: Raj — direct, no-nonsense male
+    tavusReplicaId: 'ra066ab28864',
     tavusPersonaId: undefined,
   },
   flow: {
@@ -63,7 +65,8 @@ export const AVATAR_PERSONALITIES: Record<string, AvatarPersonality> = {
     senderColor: '#22d3ee',
     // ElevenLabs: "Rachel" — calm, warm female voice
     voiceId: '21m00Tcm4TlvDq8ikWAM',
-    tavusReplicaId: undefined,
+    // Tavus: Rose — calm, patient female
+    tavusReplicaId: 'r1af76e94d00',
     tavusPersonaId: undefined,
   },
 }

@@ -13,6 +13,7 @@ export default function WorkOrdersPage() {
   const router = useRouter()
   const avatarKey = useSessionStore((s) => s.avatarKey)
   const sessionId = useSessionStore((s) => s.sessionId)
+  const setPhase = useSessionStore((s) => s.setPhase)
   const nodes = useWorkflowStore((s) => s.nodes)
   const workOrders = useWorkOrderStore((s) => s.workOrders)
   const setWorkOrders = useWorkOrderStore((s) => s.setWorkOrders)
@@ -23,6 +24,7 @@ export default function WorkOrdersPage() {
   const avatar = avatarKey ? AVATAR_PERSONALITIES[avatarKey] : null
 
   useEffect(() => {
+    setPhase('build')
     if (!avatar) {
       router.push('/build')
       return
@@ -123,9 +125,11 @@ export default function WorkOrdersPage() {
   return (
     <>
       <TopBar
-        status="Work orders"
+        status="Build Plan"
         showBack
         onBack={() => router.push(`/build/session/${sessionId}/review`)}
+        showPhases
+        avatarColor={avatar.color}
       />
       <main className="pt-14 min-h-screen px-8 py-10 max-w-4xl mx-auto">
         <div className="text-center mb-10">
@@ -139,7 +143,7 @@ export default function WorkOrdersPage() {
               color: avatar.color,
             }}
           >
-            03 — Work orders
+            04 — Build plan
           </div>
           <h1
             style={{
@@ -152,7 +156,7 @@ export default function WorkOrdersPage() {
             Build plan <em className="italic font-light" style={{ color: avatar.senderColor }}>generated.</em>
           </h1>
           <p className="font-light" style={{ color: 'var(--ink-20)', fontSize: '0.95rem' }}>
-            Review and approve these work orders. Each is a discrete unit of buildable software.
+            Review and approve your build plan. Each step is a discrete, buildable piece of your micro tool.
           </p>
         </div>
 
@@ -253,7 +257,7 @@ export default function WorkOrdersPage() {
                     boxShadow: `0 8px 32px ${avatar.glow}`,
                   }}
                 >
-                  Approve All Work Orders
+                  Approve Build Plan
                 </button>
               ) : (
                 <div className="text-center">
@@ -261,7 +265,7 @@ export default function WorkOrdersPage() {
                     className="inline-flex items-center gap-2 px-6 py-3 rounded-full mb-3"
                     style={{ background: avatar.color + '20', color: avatar.senderColor }}
                   >
-                    <span className="font-bold">&#x2713;</span> All work orders approved
+                    <span className="font-bold">&#x2713;</span> Build plan approved
                   </div>
                   <p className="text-sm" style={{ color: 'var(--ink-20)' }}>
                     Code generation will be available in a future update.

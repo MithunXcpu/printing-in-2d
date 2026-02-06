@@ -62,6 +62,18 @@ export function MessageBubble({ message, avatarColor }: MessageBubbleProps) {
           AI
         </div>
       )}
+      {message.imageUrl && (
+        <img
+          src={message.imageUrl}
+          alt="Screenshot"
+          className="rounded-lg mb-2 max-w-full"
+          style={{
+            maxHeight: '200px',
+            objectFit: 'contain',
+            border: '1px solid rgba(255,255,255,.1)',
+          }}
+        />
+      )}
       {message.content}
     </div>
   )

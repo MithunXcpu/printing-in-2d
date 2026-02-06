@@ -6,7 +6,7 @@ import { MOCK_CONVERSATIONS } from '@/lib/mock-conversations'
 import type { AvatarKey } from '@/lib/types'
 
 function createMockStream(
-  messages: Array<{ role: string; content: string }>,
+  messages: Array<{ role: string; content: string | Array<Record<string, unknown>> }>,
   avatarKey: AvatarKey
 ): ReadableStream<Uint8Array> {
   const encoder = new TextEncoder()
@@ -102,9 +102,10 @@ function createMockStream(
 }
 
 export async function POST(request: Request) {
-  const { messages, avatarKey } = (await request.json()) as {
-    messages: Array<{ role: 'user' | 'assistant'; content: string }>
+  const { messages, avatarKey, profile } = (await request.json()) as {
+    messages: Array<{ role: 'user' | 'assistant'; content: string | Array<Record<string, unknown>> }>
     avatarKey: AvatarKey
+    profile?: import('@/lib/types').UserProfile
   }
 
   // ── Mock mode: no API key needed ──
@@ -121,14 +122,16 @@ export async function POST(request: Request) {
 
   // ── Live mode: real Anthropic API ──
   const anthropic = new Anthropic()
-  const systemPrompt = getSystemPrompt(avatarKey)
+  const systemPrompt = getSystemPrompt(avatarKey, profile)
 
+  // Cast messages to the Anthropic SDK's expected type
+  // Messages with multimodal content (image + text) are already in the correct format
   const stream = anthropic.messages.stream({
     model: 'claude-sonnet-4-20250514',
     max_tokens: 1024,
     system: systemPrompt,
     tools: WORKFLOW_TOOLS,
-    messages,
+    messages: messages as Anthropic.MessageParam[],
   })
 
   const encoder = new TextEncoder()

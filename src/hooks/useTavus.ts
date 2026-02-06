@@ -13,22 +13,30 @@ export function useTavus(options?: UseTavusOptions) {
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [conversationId, setConversationId] = useState<string | null>(null)
+  const [conversationUrl, setConversationUrl] = useState<string | null>(null)
 
-  const videoRef = useRef<HTMLVideoElement | null>(null)
-  const peerConnectionRef = useRef<RTCPeerConnection | null>(null)
-  const dataChannelRef = useRef<RTCDataChannel | null>(null)
+  // Use refs to avoid stale closures in initialize callback
+  const isConnectedRef = useRef(false)
+  const isLoadingRef = useRef(false)
+  const conversationIdRef = useRef<string | null>(null)
+
+  // Keep refs in sync
+  useEffect(() => { isConnectedRef.current = isConnected }, [isConnected])
+  useEffect(() => { isLoadingRef.current = isLoading }, [isLoading])
+  useEffect(() => { conversationIdRef.current = conversationId }, [conversationId])
 
   /**
-   * Create a Tavus conversation session and connect via WebRTC
+   * Create a Tavus conversation session
    */
   const initialize = useCallback(async () => {
-    if (isConnected || isLoading) return
+    // Guard with refs to avoid stale closure issues
+    if (isConnectedRef.current || isLoadingRef.current) return
 
+    isLoadingRef.current = true
     setIsLoading(true)
     setError(null)
 
     try {
-      // 1. Create session via our API
       const response = await fetch('/api/tavus', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -40,110 +48,93 @@ export function useTavus(options?: UseTavusOptions) {
       })
 
       if (!response.ok) {
-        throw new Error('Tavus not available')
+        const text = await response.text()
+        throw new Error(text || 'Tavus not available')
       }
 
-      const { conversationId: convId, conversationUrl } = await response.json()
-      setConversationId(convId)
-
-      // 2. Connect to Tavus via WebRTC using the conversation URL
-      // The conversation URL is typically an iframe or a WebRTC signaling endpoint
-      // For now, we embed it via iframe approach (simplest Tavus integration)
-      // If the Tavus JS SDK becomes available, we'd use it for direct WebRTC
-
-      // Store the conversation URL for the component to render as an iframe
-      if (videoRef.current) {
-        // Using the Tavus embedded player
-        videoRef.current.dataset.conversationUrl = conversationUrl
-      }
-
+      const data = await response.json()
+      setConversationId(data.conversationId)
+      setConversationUrl(data.conversationUrl)
+      conversationIdRef.current = data.conversationId
+      isConnectedRef.current = true
       setIsConnected(true)
     } catch (err) {
       console.error('Tavus initialization failed:', err)
       setError((err as Error).message)
     } finally {
+      isLoadingRef.current = false
       setIsLoading(false)
     }
-  }, [isConnected, isLoading, options?.replicaId, options?.personaId, options?.avatarName])
+  }, [options?.replicaId, options?.personaId, options?.avatarName])
 
   /**
-   * Send text for the avatar to speak
-   * In Tavus CVI, messages are sent via the conversation's data channel or REST API
+   * Send text for the avatar to speak — routed through our API to keep API key server-side
    */
   const speak = useCallback(
     async (text: string) => {
-      if (!isConnected || !conversationId) return
+      const convId = conversationIdRef.current
+      if (!convId) return
 
       try {
-        // Send message to Tavus conversation via REST
-        // The avatar will speak this text with lip-sync
-        await fetch(`https://tavusapi.com/v2/conversations/${conversationId}/messages`, {
+        await fetch('/api/tavus/speak', {
           method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
+          headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
+            conversationId: convId,
             message: text,
-            type: 'assistant',
           }),
         })
       } catch (err) {
         console.warn('Tavus speak failed:', err)
       }
     },
-    [isConnected, conversationId]
+    [] // No state deps needed — uses refs
   )
 
   /**
    * Disconnect and cleanup
    */
   const disconnect = useCallback(async () => {
-    if (peerConnectionRef.current) {
-      peerConnectionRef.current.close()
-      peerConnectionRef.current = null
-    }
-    if (dataChannelRef.current) {
-      dataChannelRef.current.close()
-      dataChannelRef.current = null
-    }
-
-    // End the conversation on Tavus side
-    if (conversationId) {
+    const convId = conversationIdRef.current
+    if (convId) {
       try {
         await fetch('/api/tavus', {
           method: 'DELETE',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ conversationId }),
+          body: JSON.stringify({ conversationId: convId }),
         })
       } catch {
         // Best effort cleanup
       }
     }
 
+    isConnectedRef.current = false
+    conversationIdRef.current = null
     setIsConnected(false)
     setConversationId(null)
-  }, [conversationId])
+    setConversationUrl(null)
+  }, [])
 
   // Cleanup on unmount
   useEffect(() => {
     return () => {
-      if (conversationId) {
-        // Fire-and-forget cleanup
+      const convId = conversationIdRef.current
+      if (convId) {
         fetch('/api/tavus', {
           method: 'DELETE',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ conversationId }),
+          body: JSON.stringify({ conversationId: convId }),
         }).catch(() => {})
       }
     }
-  }, [conversationId])
+  }, [])
 
   return {
-    videoRef,
     isConnected,
     isLoading,
     error,
     conversationId,
+    conversationUrl,
     initialize,
     speak,
     disconnect,

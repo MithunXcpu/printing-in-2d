@@ -27,6 +27,7 @@ export default function SessionPage() {
   const router = useRouter()
   const avatarKey = useSessionStore((s) => s.avatarKey)
   const sessionId = useSessionStore((s) => s.sessionId)
+  const setPhase = useSessionStore((s) => s.setPhase)
   const interviewStage = useConversationStore((s) => s.interviewStage)
   const clearMessages = useConversationStore((s) => s.clearMessages)
   const resetWorkflow = useWorkflowStore((s) => s.reset)
@@ -74,13 +75,11 @@ export default function SessionPage() {
   // Keep sendMessage ref in sync for speech recognition callback
   sendMessageRef.current = sendMessage
 
-  // Screenshot handler — takes screenshot and sends as a message with context
+  // Screenshot handler — takes screenshot and sends as multimodal message to Claude
   const handleScreenshot = useCallback(async () => {
     const dataUrl = await takeScreenshot()
     if (dataUrl) {
-      // For now, notify the user the screenshot was taken
-      // TODO: Send as vision input to Claude when multimodal is supported
-      sendMessage('[Screenshot captured — I\'m sharing my screen with you]')
+      sendMessage('Here\'s a screenshot of what I\'m looking at — can you help me with this?', dataUrl)
     }
   }, [takeScreenshot, sendMessage])
 
@@ -120,10 +119,13 @@ export default function SessionPage() {
       return
     }
 
+    // Set phase to design (chat mode)
+    setPhase('design')
+
     // Set avatar CSS color
     document.documentElement.style.setProperty('--avatar-color', avatar?.color || '#2d8014')
     document.documentElement.style.setProperty('--avatar-glow', avatar?.glow || 'rgba(45,128,20,.15)')
-  }, [avatarKey, avatar, router])
+  }, [avatarKey, avatar, router, setPhase])
 
   // Send greeting exactly once — separate effect with no changing deps
   useEffect(() => {
@@ -149,6 +151,8 @@ export default function SessionPage() {
         status={`Building with ${avatar.name}`}
         showBack
         onBack={() => router.push('/build')}
+        showPhases
+        avatarColor={avatar.color}
       />
       <main
         className="pt-14 h-screen grid"

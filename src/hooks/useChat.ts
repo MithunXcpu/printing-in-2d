@@ -12,6 +12,13 @@ interface UseChatOptions {
 }
 
 export function useChat(avatarKey: AvatarKey, options?: UseChatOptions) {
+  // Use a ref for options to always call the latest callbacks without
+  // causing sendMessage/sendGreeting to be recreated on every render
+  const optionsRef = useRef(options)
+  optionsRef.current = options
+  const profile = useInterviewStore((s) => s.profile)
+  const profileRef = useRef(profile)
+  profileRef.current = profile
   const addMessage = useConversationStore((s) => s.addMessage)
   const setStreaming = useConversationStore((s) => s.setStreaming)
   const setCurrentStreamingText = useConversationStore((s) => s.setCurrentStreamingText)
@@ -47,7 +54,7 @@ export function useChat(avatarKey: AvatarKey, options?: UseChatOptions) {
           })
           setTimeout(() => revealNode(nodeId), 300)
           // Fire-and-forget: generate AI image for this node
-          options?.generateNodeImage?.(nodeId, nodeLabel, nodeDesc, nodeType)
+          optionsRef.current?.generateNodeImage?.(nodeId, nodeLabel, nodeDesc, nodeType)
           break
         }
         case 'add_workflow_connection': {
@@ -81,7 +88,7 @@ export function useChat(avatarKey: AvatarKey, options?: UseChatOptions) {
         }
       }
     },
-    [addNode, revealNode, addConnection, setCommentary, clearCommentary, setInterviewStage, setStage, updateProfile, options]
+    [addNode, revealNode, addConnection, setCommentary, clearCommentary, setInterviewStage, setStage, updateProfile]
   )
 
   /**
@@ -173,12 +180,25 @@ export function useChat(avatarKey: AvatarKey, options?: UseChatOptions) {
   )
 
   const sendMessage = useCallback(
-    async (userMessage: string) => {
+    async (userMessage: string, imageUrl?: string) => {
       // Clear previous suggestions
       setSuggestions([])
 
-      // Add user message
-      addMessage({ role: 'user', content: userMessage })
+      // Add user message (with optional image)
+      addMessage({ role: 'user', content: userMessage, imageUrl })
+
+      // Build the new user message content — multimodal if image attached
+      let newUserContent: string | Array<Record<string, unknown>> = userMessage
+      if (imageUrl) {
+        // Extract base64 data and media type from data URL
+        const match = imageUrl.match(/^data:(image\/\w+);base64,(.+)$/)
+        if (match) {
+          newUserContent = [
+            { type: 'image', source: { type: 'base64', media_type: match[1], data: match[2] } },
+            { type: 'text', text: userMessage },
+          ]
+        }
+      }
 
       // Build conversation history for API
       const history = [
@@ -186,7 +206,7 @@ export function useChat(avatarKey: AvatarKey, options?: UseChatOptions) {
           role: m.role as 'user' | 'assistant',
           content: m.content,
         })),
-        { role: 'user' as const, content: userMessage },
+        { role: 'user' as const, content: newUserContent },
       ].filter((m) => m.role === 'user' || m.role === 'assistant')
 
       setStreaming(true)
@@ -198,7 +218,7 @@ export function useChat(avatarKey: AvatarKey, options?: UseChatOptions) {
         const response = await fetch('/api/chat', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ messages: history, avatarKey }),
+          body: JSON.stringify({ messages: history, avatarKey, profile: profileRef.current }),
           signal: abortRef.current.signal,
         })
 
@@ -214,7 +234,7 @@ export function useChat(avatarKey: AvatarKey, options?: UseChatOptions) {
         // Finalize the assistant message
         if (fullText) {
           addMessage({ role: 'assistant', content: fullText })
-          options?.onAssistantResponse?.(fullText)
+          optionsRef.current?.onAssistantResponse?.(fullText)
         }
       } catch (error) {
         if ((error as Error).name !== 'AbortError') {
@@ -229,22 +249,35 @@ export function useChat(avatarKey: AvatarKey, options?: UseChatOptions) {
         setCurrentStreamingText('')
       }
     },
-    [avatarKey, messages, addMessage, setStreaming, setCurrentStreamingText, setSuggestions, processStream, options]
+    [avatarKey, messages, addMessage, setStreaming, setCurrentStreamingText, setSuggestions, processStream]
   )
 
-  // Send initial greeting
+  // Send initial greeting — uses onboarding profile data if available
   const sendGreeting = useCallback(async () => {
     setSuggestions([])
     setStreaming(true)
     setCurrentStreamingText('')
+
+    // Build a contextual greeting that includes what the user told us during onboarding
+    const p = profileRef.current
+    let greetingMsg = 'Hello! I want to build a micro tool for my workflow.'
+    if (p?.name || p?.painPoints?.[0]) {
+      const parts = []
+      if (p.name) parts.push(`My name is ${p.name}.`)
+      if (p.role) parts.push(`I'm a ${p.role}${p.industry ? ` in ${p.industry}` : ''}.`)
+      if (p.painPoints?.[0]) parts.push(`My main pain point: ${p.painPoints[0]}`)
+      if (p.desiredOutcomes?.[0]) parts.push(`What I want: ${p.desiredOutcomes[0]}`)
+      greetingMsg = parts.join(' ')
+    }
 
     try {
       const response = await fetch('/api/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          messages: [{ role: 'user', content: 'Hello! I want to build a workflow for my business process.' }],
+          messages: [{ role: 'user', content: greetingMsg }],
           avatarKey,
+          profile: profileRef.current,
         }),
       })
 
@@ -257,19 +290,20 @@ export function useChat(avatarKey: AvatarKey, options?: UseChatOptions) {
 
       if (fullText) {
         addMessage({ role: 'assistant', content: fullText })
-        options?.onAssistantResponse?.(fullText)
+        optionsRef.current?.onAssistantResponse?.(fullText)
       }
     } catch (error) {
       console.error('Greeting error:', error)
       addMessage({
         role: 'assistant',
-        content: "Hello! I'm here to help you build a workflow. What outcome are you trying to achieve?",
+        content: "Hello! I'm here to help you design a micro tool. What repetitive task is eating your time?",
       })
     } finally {
       setStreaming(false)
       setCurrentStreamingText('')
     }
-  }, [avatarKey, addMessage, setStreaming, setCurrentStreamingText, setSuggestions, processStream, options])
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [avatarKey, addMessage, setStreaming, setCurrentStreamingText, setSuggestions, processStream])
 
   return { sendMessage, sendGreeting, handleToolCall }
 }

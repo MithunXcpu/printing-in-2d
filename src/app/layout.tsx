@@ -1,4 +1,6 @@
 import type { Metadata } from 'next'
+import { ClerkProvider } from '@clerk/nextjs'
+import { dark } from '@clerk/themes'
 import { Outfit, Fraunces, JetBrains_Mono } from 'next/font/google'
 import './globals.css'
 
@@ -26,17 +28,37 @@ export const metadata: Metadata = {
   description: 'Meet your AI co-builder. Pick one. Start talking. Watch it build working software from conversation.',
 }
 
+const hasClerk = !!process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY
+
+const clerkAppearance = {
+  baseTheme: dark,
+  variables: {
+    colorPrimary: '#2d8014',
+    colorBackground: '#0d1208',
+    colorInputBackground: '#151a10',
+    colorText: 'rgba(255,255,255,.9)',
+  },
+}
+
 export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode
 }>) {
-  return (
+  const body = (
     <html lang="en">
       <body className={`${outfit.variable} ${fraunces.variable} ${jetbrainsMono.variable} antialiased`}>
         <div className="texture" />
         {children}
       </body>
     </html>
+  )
+
+  if (!hasClerk) return body
+
+  return (
+    <ClerkProvider appearance={clerkAppearance}>
+      {body}
+    </ClerkProvider>
   )
 }

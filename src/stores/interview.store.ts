@@ -4,9 +4,11 @@ import type { InterviewStage, UserProfile } from '@/lib/types'
 interface InterviewState {
   stage: InterviewStage
   profile: UserProfile
+  onboardingComplete: boolean
 
   updateProfile: (updates: Partial<UserProfile>) => void
   setStage: (stage: InterviewStage) => void
+  setOnboardingComplete: (complete: boolean) => void
   reset: () => void
 }
 
@@ -20,6 +22,7 @@ const initialProfile: UserProfile = {
 export const useInterviewStore = create<InterviewState>((set) => ({
   stage: 'outcome',
   profile: { ...initialProfile },
+  onboardingComplete: false,
 
   updateProfile: (updates) =>
     set((state) => ({
@@ -27,6 +30,7 @@ export const useInterviewStore = create<InterviewState>((set) => ({
     })),
 
   setStage: (stage) => set({ stage }),
+  setOnboardingComplete: (onboardingComplete) => set({ onboardingComplete }),
 
-  reset: () => set({ stage: 'outcome', profile: { ...initialProfile } }),
+  reset: () => set({ stage: 'outcome', profile: { ...initialProfile }, onboardingComplete: false }),
 }))

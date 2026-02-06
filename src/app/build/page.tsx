@@ -13,12 +13,13 @@ export default function BuildPage() {
   const handleSelectAvatar = (key: AvatarKey) => {
     const sessionId = `session-${Date.now()}`
     setSession(sessionId, key)
-    router.push(`/build/session/${sessionId}`)
+    // Go to onboarding screens before the chat
+    router.push('/build/onboard')
   }
 
   return (
     <>
-      <TopBar status="Select your co-builder" />
+      <TopBar status="Step 1 of 5 — Choose your guide" />
       <main className="pt-14 min-h-screen flex items-center justify-center">
         <AvatarSelector onSelect={handleSelectAvatar} />
       </main>

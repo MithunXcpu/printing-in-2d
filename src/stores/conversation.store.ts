@@ -8,7 +8,7 @@ interface ConversationState {
   interviewStage: InterviewStage
   suggestions: string[]
 
-  addMessage: (msg: Omit<Message, 'id' | 'timestamp'>) => void
+  addMessage: (msg: Omit<Message, 'id' | 'timestamp'> & { imageUrl?: string }) => void
   updateLastAssistantMessage: (content: string) => void
   setStreaming: (streaming: boolean) => void
   setCurrentStreamingText: (text: string) => void

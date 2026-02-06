@@ -1,0 +1,275 @@
+'use client'
+
+import { useCallback, useRef } from 'react'
+import { useConversationStore } from '@/stores/conversation.store'
+import { useWorkflowStore } from '@/stores/workflow.store'
+import { useInterviewStore } from '@/stores/interview.store'
+import type { AvatarKey, InterviewStage, WorkflowNodeType } from '@/lib/types'
+
+interface UseChatOptions {
+  onAssistantResponse?: (text: string) => void
+  generateNodeImage?: (nodeId: string, label: string, description: string | undefined, type: WorkflowNodeType) => void
+}
+
+export function useChat(avatarKey: AvatarKey, options?: UseChatOptions) {
+  const addMessage = useConversationStore((s) => s.addMessage)
+  const setStreaming = useConversationStore((s) => s.setStreaming)
+  const setCurrentStreamingText = useConversationStore((s) => s.setCurrentStreamingText)
+  const setInterviewStage = useConversationStore((s) => s.setInterviewStage)
+  const setSuggestions = useConversationStore((s) => s.setSuggestions)
+  const messages = useConversationStore((s) => s.messages)
+
+  const addNode = useWorkflowStore((s) => s.addNode)
+  const revealNode = useWorkflowStore((s) => s.revealNode)
+  const addConnection = useWorkflowStore((s) => s.addConnection)
+  const setCommentary = useWorkflowStore((s) => s.setCommentary)
+  const clearCommentary = useWorkflowStore((s) => s.clearCommentary)
+
+  const updateProfile = useInterviewStore((s) => s.updateProfile)
+  const setStage = useInterviewStore((s) => s.setStage)
+
+  const abortRef = useRef<AbortController | null>(null)
+
+  const handleToolCall = useCallback(
+    (toolName: string, toolInput: Record<string, unknown>) => {
+      switch (toolName) {
+        case 'add_workflow_node': {
+          const nodeId = toolInput.id as string
+          const nodeLabel = toolInput.label as string
+          const nodeType = toolInput.type as 'source' | 'processor' | 'decision' | 'output' | 'ai'
+          const nodeDesc = toolInput.description as string | undefined
+          addNode({
+            id: nodeId,
+            label: nodeLabel,
+            type: nodeType,
+            icon: (toolInput.icon as string) || '📦',
+            description: nodeDesc,
+          })
+          setTimeout(() => revealNode(nodeId), 300)
+          // Fire-and-forget: generate AI image for this node
+          options?.generateNodeImage?.(nodeId, nodeLabel, nodeDesc, nodeType)
+          break
+        }
+        case 'add_workflow_connection': {
+          addConnection({
+            from: toolInput.from as string,
+            to: toolInput.to as string,
+            label: toolInput.label as string | undefined,
+          })
+          break
+        }
+        case 'update_interview_stage': {
+          const stage = toolInput.stage as InterviewStage
+          setInterviewStage(stage)
+          setStage(stage)
+          if (toolInput.commentary) {
+            setCommentary(toolInput.commentary as string)
+            setTimeout(() => clearCommentary(), 4000)
+          }
+          break
+        }
+        case 'extract_user_context': {
+          updateProfile({
+            role: toolInput.role as string | undefined,
+            department: toolInput.department as string | undefined,
+            companyContext: toolInput.company_context as string | undefined,
+            desiredOutcomes: toolInput.desired_outcomes as string[] | undefined,
+            painPoints: toolInput.pain_points as string[] | undefined,
+            currentTools: toolInput.current_tools as string[] | undefined,
+          })
+          break
+        }
+      }
+    },
+    [addNode, revealNode, addConnection, setCommentary, clearCommentary, setInterviewStage, setStage, updateProfile, options]
+  )
+
+  /**
+   * Processes a stream of JSON-line events from the /api/chat endpoint.
+   * Handles both real Anthropic events and mock-mode custom events.
+   */
+  const processStream = useCallback(
+    async (reader: ReadableStreamDefaultReader<Uint8Array>, signal?: AbortSignal) => {
+      const decoder = new TextDecoder()
+      let buffer = ''
+      let fullText = ''
+
+      // Tool call accumulation state
+      let currentToolName = ''
+      let currentToolInput = ''
+
+      while (true) {
+        if (signal?.aborted) break
+        const { done, value } = await reader.read()
+        if (done) break
+
+        buffer += decoder.decode(value, { stream: true })
+        const lines = buffer.split('\n')
+        buffer = lines.pop() || ''
+
+        for (const line of lines) {
+          if (!line.trim()) continue
+          try {
+            const event = JSON.parse(line)
+
+            // ── Text deltas ──
+            if (event.type === 'content_block_delta') {
+              if (event.delta?.type === 'text_delta') {
+                fullText += event.delta.text
+                setCurrentStreamingText(fullText)
+              }
+              if (event.delta?.type === 'input_json_delta') {
+                // Accumulate JSON input for the current tool call
+                currentToolInput += event.delta.partial_json || ''
+              }
+            }
+
+            // ── Tool call starting ──
+            if (event.type === 'content_block_start') {
+              if (event.content_block?.type === 'tool_use') {
+                currentToolName = event.content_block.name || ''
+                currentToolInput = ''
+              }
+            }
+
+            // ── Content block stop → dispatch tool call if we have one ──
+            if (event.type === 'content_block_stop') {
+              if (currentToolName && currentToolInput) {
+                try {
+                  const input = JSON.parse(currentToolInput)
+                  handleToolCall(currentToolName, input)
+                } catch {
+                  console.warn('Failed to parse tool input:', currentToolInput)
+                }
+                currentToolName = ''
+                currentToolInput = ''
+              }
+            }
+
+            // ── Mock suggestions (custom event) ──
+            if (event.type === 'mock_suggestions') {
+              setSuggestions(event.suggestions || [])
+            }
+
+            // ── Mock commentary (custom event) ──
+            if (event.type === 'mock_commentary') {
+              setCommentary(event.commentary || '')
+              setTimeout(() => clearCommentary(), 4000)
+            }
+
+            // ── Errors ──
+            if (event.type === 'error') {
+              console.error('Stream error:', event.error)
+            }
+          } catch {
+            // Skip unparseable lines
+          }
+        }
+      }
+
+      return fullText
+    },
+    [setCurrentStreamingText, handleToolCall, setSuggestions, setCommentary, clearCommentary]
+  )
+
+  const sendMessage = useCallback(
+    async (userMessage: string) => {
+      // Clear previous suggestions
+      setSuggestions([])
+
+      // Add user message
+      addMessage({ role: 'user', content: userMessage })
+
+      // Build conversation history for API
+      const history = [
+        ...messages.map((m) => ({
+          role: m.role as 'user' | 'assistant',
+          content: m.content,
+        })),
+        { role: 'user' as const, content: userMessage },
+      ].filter((m) => m.role === 'user' || m.role === 'assistant')
+
+      setStreaming(true)
+      setCurrentStreamingText('')
+
+      abortRef.current = new AbortController()
+
+      try {
+        const response = await fetch('/api/chat', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ messages: history, avatarKey }),
+          signal: abortRef.current.signal,
+        })
+
+        if (!response.ok) {
+          throw new Error(`API error: ${response.status}`)
+        }
+
+        const reader = response.body?.getReader()
+        if (!reader) throw new Error('No reader')
+
+        const fullText = await processStream(reader, abortRef.current.signal)
+
+        // Finalize the assistant message
+        if (fullText) {
+          addMessage({ role: 'assistant', content: fullText })
+          options?.onAssistantResponse?.(fullText)
+        }
+      } catch (error) {
+        if ((error as Error).name !== 'AbortError') {
+          console.error('Chat error:', error)
+          addMessage({
+            role: 'system',
+            content: 'Connection error. Please try again.',
+          })
+        }
+      } finally {
+        setStreaming(false)
+        setCurrentStreamingText('')
+      }
+    },
+    [avatarKey, messages, addMessage, setStreaming, setCurrentStreamingText, setSuggestions, processStream, options]
+  )
+
+  // Send initial greeting
+  const sendGreeting = useCallback(async () => {
+    setSuggestions([])
+    setStreaming(true)
+    setCurrentStreamingText('')
+
+    try {
+      const response = await fetch('/api/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          messages: [{ role: 'user', content: 'Hello! I want to build a workflow for my business process.' }],
+          avatarKey,
+        }),
+      })
+
+      if (!response.ok) throw new Error(`API error: ${response.status}`)
+
+      const reader = response.body?.getReader()
+      if (!reader) throw new Error('No reader')
+
+      const fullText = await processStream(reader)
+
+      if (fullText) {
+        addMessage({ role: 'assistant', content: fullText })
+        options?.onAssistantResponse?.(fullText)
+      }
+    } catch (error) {
+      console.error('Greeting error:', error)
+      addMessage({
+        role: 'assistant',
+        content: "Hello! I'm here to help you build a workflow. What outcome are you trying to achieve?",
+      })
+    } finally {
+      setStreaming(false)
+      setCurrentStreamingText('')
+    }
+  }, [avatarKey, addMessage, setStreaming, setCurrentStreamingText, setSuggestions, processStream, options])
+
+  return { sendMessage, sendGreeting, handleToolCall }
+}

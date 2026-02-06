@@ -43,6 +43,7 @@ export default function SessionPage() {
 
   // Tavus state
   const [tavusConnected, setTavusConnected] = useState(false)
+  const [tavusFailed, setTavusFailed] = useState(false)
   const tavusSpeakRef = useRef<((text: string) => Promise<void>) | null>(null)
 
   // Generative 3D avatar state
@@ -116,6 +117,7 @@ export default function SessionPage() {
 
   const handleTavusError = useCallback(() => {
     setTavusConnected(false)
+    setTavusFailed(true)
     tavusSpeakRef.current = null
   }, [])
 
@@ -170,8 +172,25 @@ export default function SessionPage() {
   if (!avatar) return null
 
   const showReviewButton = interviewStage === 'review'
-  // Tavus enabled by default — falls back to GenerativeAvatar if API returns 503
-  const showTavus = true
+
+  // Determine which avatar to render:
+  // 1. Try Tavus first (if it hasn't failed)
+  // 2. Fall back to GenerativeAvatar (3D) if Tavus fails
+  const avatarSlotElement = !tavusFailed ? (
+    <TavusAvatar
+      avatar={avatar}
+      onConnected={handleTavusConnected}
+      onError={handleTavusError}
+      onSpeak={handleTavusSpeak}
+    />
+  ) : (
+    <GenerativeAvatar
+      avatar={avatar}
+      onConnected={handleGenerativeConnected}
+      onError={handleGenerativeError}
+      onSpeak={handleGenerativeSpeak}
+    />
+  )
 
   return (
     <>
@@ -191,23 +210,7 @@ export default function SessionPage() {
         <ChatPanel
           avatar={avatar}
           onSendMessage={sendMessage}
-          avatarSlot={
-            showTavus ? (
-              <TavusAvatar
-                avatar={avatar}
-                onConnected={handleTavusConnected}
-                onError={handleTavusError}
-                onSpeak={handleTavusSpeak}
-              />
-            ) : (
-              <GenerativeAvatar
-                avatar={avatar}
-                onConnected={handleGenerativeConnected}
-                onError={handleGenerativeError}
-                onSpeak={handleGenerativeSpeak}
-              />
-            )
-          }
+          avatarSlot={avatarSlotElement}
           callControlsSlot={
             <CallControls
               isListening={isListening}

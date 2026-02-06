@@ -26,7 +26,7 @@ export async function POST(request: Request) {
     const voice = voiceId || DEFAULT_VOICE_ID
 
     const response = await fetch(
-      `${ELEVENLABS_BASE}/text-to-speech/${voice}/stream`,
+      `${ELEVENLABS_BASE}/text-to-speech/${voice}/stream?optimize_streaming_latency=3`,
       {
         method: 'POST',
         headers: {
@@ -35,11 +35,11 @@ export async function POST(request: Request) {
         },
         body: JSON.stringify({
           text: text.slice(0, 5000), // ElevenLabs has a char limit
-          model_id: 'eleven_multilingual_v2',
+          model_id: 'eleven_turbo_v2_5',
           voice_settings: {
-            stability: 0.5,
-            similarity_boost: 0.8,
-            style: 0.2,
+            stability: 0.75,
+            similarity_boost: 0.85,
+            style: 0.15,
             use_speaker_boost: true,
           },
         }),

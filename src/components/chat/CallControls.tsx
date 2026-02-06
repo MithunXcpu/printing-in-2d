@@ -31,7 +31,12 @@ export function CallControls({
   color,
 }: CallControlsProps) {
   return (
-    <div>
+    <div
+      style={{
+        borderTop: '1px solid rgba(255,255,255,.04)',
+        background: 'rgba(255,255,255,.02)',
+      }}
+    >
       {/* Interim transcript display */}
       {interimTranscript && (
         <div

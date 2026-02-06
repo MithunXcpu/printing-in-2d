@@ -5,6 +5,7 @@ import { useAvatar } from '@/hooks/useAvatar'
 
 interface AvatarCanvasInnerProps {
   avatarUrl?: string
+  glowColor?: string
   onSpeakingStart?: () => void
   onSpeakingEnd?: () => void
   onLoaded?: () => void
@@ -13,6 +14,7 @@ interface AvatarCanvasInnerProps {
 
 export default function AvatarCanvasInner({
   avatarUrl,
+  glowColor = 'rgba(99, 102, 241, 0.4)',
   onSpeakingStart,
   onSpeakingEnd,
   onLoaded,
@@ -37,8 +39,22 @@ export default function AvatarCanvasInner({
   }, [error, onError])
 
   return (
-    <div className="relative w-full h-full">
+    <div
+      className="relative w-full h-full rounded-2xl overflow-hidden"
+      style={{
+        background: `radial-gradient(ellipse at center, ${glowColor} 0%, transparent 70%)`,
+      }}
+    >
       <div ref={containerRef} className="w-full h-full" />
+
+      {/* Vignette overlay — dark edges */}
+      <div
+        className="pointer-events-none absolute inset-0"
+        style={{
+          background:
+            'radial-gradient(ellipse at center, transparent 50%, rgba(0, 0, 0, 0.45) 100%)',
+        }}
+      />
 
       {isLoading && (
         <div className="absolute inset-0 flex items-center justify-center">

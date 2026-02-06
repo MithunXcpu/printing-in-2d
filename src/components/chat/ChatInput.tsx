@@ -31,7 +31,10 @@ export function ChatInput({ onSend, disabled, placeholder = 'Type your response.
   return (
     <div
       className="px-6 py-4 flex items-end gap-3"
-      style={{ borderTop: '1px solid rgba(255,255,255,.04)' }}
+      style={{
+        borderTop: '1px solid rgba(255,255,255,.08)',
+        background: 'rgba(0,0,0,.1)',
+      }}
     >
       <textarea
         ref={inputRef}
@@ -55,6 +58,7 @@ export function ChatInput({ onSend, disabled, placeholder = 'Type your response.
         className="flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center transition-all disabled:opacity-30"
         style={{
           background: avatarColor || 'var(--green-400)',
+          boxShadow: value.trim() ? `0 0 12px ${avatarColor || 'var(--green-400)'}44` : 'none',
         }}
       >
         <svg width="14" height="14" viewBox="0 0 14 14" fill="none">

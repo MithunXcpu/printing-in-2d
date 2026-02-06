@@ -1,22 +1,30 @@
 import type { WorkflowNodeType } from './types'
 
-const COLUMN_POSITIONS: Record<WorkflowNodeType, { xMin: number; xMax: number }> = {
-  source: { xMin: 5, xMax: 15 },
-  processor: { xMin: 30, xMax: 42 },
-  ai: { xMin: 30, xMax: 42 },
-  decision: { xMin: 55, xMax: 65 },
-  output: { xMin: 78, xMax: 88 },
+// Column centers for each node type — left-to-right flow
+// Shifted inward slightly to prevent nodes from getting clipped at container edges
+const COLUMN_X: Record<WorkflowNodeType, number> = {
+  source: 14,
+  processor: 36,
+  ai: 50,
+  decision: 64,
+  output: 82,
 }
 
-const Y_POSITIONS = [15, 42, 70, 25, 58, 85]
+// Vertical distribution
+const Y_START = 22
+const Y_SPACING = 20
 
 export function calculateNodePosition(
   type: WorkflowNodeType,
   existingCountInColumn: number
 ): { x: number; y: number } {
-  const col = COLUMN_POSITIONS[type]
-  const x = (col.xMin + col.xMax) / 2
-  const y = Y_POSITIONS[existingCountInColumn % Y_POSITIONS.length]
+  const x = COLUMN_X[type]
 
-  return { x, y }
+  // Distribute vertically with consistent spacing
+  const y = Y_START + existingCountInColumn * Y_SPACING
+
+  // Clamp to keep nodes within 15-85% range
+  const clampedY = Math.min(Math.max(y, 15), 85)
+
+  return { x, y: clampedY }
 }

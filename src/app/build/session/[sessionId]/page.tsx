@@ -23,6 +23,12 @@ const TavusAvatar = dynamic(
   { ssr: false }
 )
 
+// Dynamic import GenerativeAvatar (3D TalkingHead) — fallback when Tavus is unavailable
+const GenerativeAvatar = dynamic(
+  () => import('@/components/avatar/GenerativeAvatar').then((m) => ({ default: m.GenerativeAvatar })),
+  { ssr: false }
+)
+
 export default function SessionPage() {
   const router = useRouter()
   const avatarKey = useSessionStore((s) => s.avatarKey)
@@ -39,6 +45,10 @@ export default function SessionPage() {
   const [tavusConnected, setTavusConnected] = useState(false)
   const tavusSpeakRef = useRef<((text: string) => Promise<void>) | null>(null)
 
+  // Generative 3D avatar state
+  const [generativeConnected, setGenerativeConnected] = useState(false)
+  const generativeSpeakRef = useRef<((text: string) => void) | null>(null)
+
   // ElevenLabs / browser TTS — disabled when Tavus handles audio
   const { speak: speakTTS } = useSpeechSynthesis({ disabled: tavusConnected })
   const { generateNodeImage } = useImageGeneration()
@@ -53,18 +63,22 @@ export default function SessionPage() {
   // Screen capture (screenshots + recording)
   const { takeScreenshot, startRecording, stopRecording, isCapturing, isRecording, stopCapture } = useScreenCapture()
 
-  // Speech routing: Tavus → ElevenLabs → Browser TTS
+  // Speech routing: Tavus → Generative 3D → ElevenLabs → Browser TTS
   const onAssistantResponse = useCallback(
     (text: string) => {
       if (tavusConnected && tavusSpeakRef.current) {
         // Tavus handles both video + audio
         tavusSpeakRef.current(text)
+      } else if (generativeConnected && generativeSpeakRef.current) {
+        // 3D avatar handles lip-sync from text — also play audio via TTS
+        generativeSpeakRef.current(text)
+        speakTTS(text, avatar?.voiceId)
       } else {
         // ElevenLabs (or browser TTS fallback)
         speakTTS(text, avatar?.voiceId)
       }
     },
-    [tavusConnected, speakTTS, avatar?.voiceId]
+    [tavusConnected, generativeConnected, speakTTS, avatar?.voiceId]
   )
 
   const { sendMessage, sendGreeting } = useChat(avatarKey || 'oracle', {
@@ -109,6 +123,20 @@ export default function SessionPage() {
     tavusSpeakRef.current = speakFn
   }, [])
 
+  // Generative 3D avatar callbacks
+  const handleGenerativeConnected = useCallback(() => {
+    setGenerativeConnected(true)
+  }, [])
+
+  const handleGenerativeError = useCallback(() => {
+    setGenerativeConnected(false)
+    generativeSpeakRef.current = null
+  }, [])
+
+  const handleGenerativeSpeak = useCallback((speakFn: (text: string) => void) => {
+    generativeSpeakRef.current = speakFn
+  }, [])
+
   // Store sendGreeting in a ref to avoid dependency issues
   const sendGreetingRef = useRef(sendGreeting)
   sendGreetingRef.current = sendGreeting
@@ -142,8 +170,8 @@ export default function SessionPage() {
   if (!avatar) return null
 
   const showReviewButton = interviewStage === 'review'
-  // Only attempt Tavus if the avatar has replica/persona IDs configured
-  const showTavus = !!(avatar.tavusReplicaId || avatar.tavusPersonaId)
+  // Only show Tavus when explicitly enabled via env var (requires valid Tavus API key)
+  const showTavus = false // Tavus disabled — using GenerativeAvatar instead
 
   return (
     <>
@@ -157,7 +185,7 @@ export default function SessionPage() {
       <main
         className="pt-14 h-screen grid"
         style={{
-          gridTemplateColumns: '420px 1fr',
+          gridTemplateColumns: '380px 1fr',
         }}
       >
         <ChatPanel
@@ -171,7 +199,14 @@ export default function SessionPage() {
                 onError={handleTavusError}
                 onSpeak={handleTavusSpeak}
               />
-            ) : undefined
+            ) : (
+              <GenerativeAvatar
+                avatar={avatar}
+                onConnected={handleGenerativeConnected}
+                onError={handleGenerativeError}
+                onSpeak={handleGenerativeSpeak}
+              />
+            )
           }
           callControlsSlot={
             <CallControls

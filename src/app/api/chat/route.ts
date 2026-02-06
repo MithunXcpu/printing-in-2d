@@ -128,7 +128,7 @@ export async function POST(request: Request) {
   // Messages with multimodal content (image + text) are already in the correct format
   const stream = anthropic.messages.stream({
     model: 'claude-sonnet-4-20250514',
-    max_tokens: 1024,
+    max_tokens: 2048,
     system: systemPrompt,
     tools: WORKFLOW_TOOLS,
     messages: messages as Anthropic.MessageParam[],

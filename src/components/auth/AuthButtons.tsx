@@ -15,7 +15,9 @@ export function AuthButtons({ fallback }: { fallback?: ReactNode }) {
 
   useEffect(() => {
     if (clerk) return
-    // Only try to load Clerk at runtime — skips if publishable key is missing
+    // Only try to load Clerk at runtime — skip if publishable key is missing
+    const key = process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY
+    if (!key) return
     import('@clerk/nextjs')
       .then((mod) => {
         ClerkComponents = mod
@@ -70,6 +72,8 @@ export function AuthCTA() {
 
   useEffect(() => {
     if (clerk) return
+    const key = process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY
+    if (!key) return
     import('@clerk/nextjs')
       .then((mod) => {
         ClerkComponents = mod

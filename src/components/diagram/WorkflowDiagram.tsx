@@ -66,7 +66,13 @@ export function WorkflowDiagram({ avatar }: WorkflowDiagramProps) {
       </div>
 
       {/* Canvas */}
-      <div className="flex-1 relative overflow-hidden min-h-0">
+      <div
+        className="flex-1 relative overflow-hidden min-h-0"
+        style={{
+          backgroundImage: 'radial-gradient(circle at 1px 1px, rgba(255,255,255,.07) 1px, transparent 0)',
+          backgroundSize: '48px 48px',
+        }}
+      >
         {/* Background glow */}
         <div
           className="absolute w-[400px] h-[400px] rounded-full pointer-events-none"
@@ -82,7 +88,7 @@ export function WorkflowDiagram({ avatar }: WorkflowDiagramProps) {
         />
 
         {/* SVG connections */}
-        <svg className="absolute inset-0 w-full h-full z-[1]" viewBox="0 0 100 100" preserveAspectRatio="none">
+        <svg className="absolute inset-0 w-full h-full z-[1]">
           {connections.map((conn) => (
             <DiagramConnection
               key={conn.id}

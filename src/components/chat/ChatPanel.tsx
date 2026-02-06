@@ -132,6 +132,15 @@ export function ChatPanel({ avatar, onSendMessage, disabled, avatarSlot, callCon
         </div>
       ) : null}
 
+      {/* Gradient separator between header and messages */}
+      <div
+        style={{
+          height: '2px',
+          background: `linear-gradient(to right, ${avatar.senderColor}, transparent)`,
+          flexShrink: 0,
+        }}
+      />
+
       {/* Messages */}
       <div
         className="flex-1 overflow-y-auto px-6 py-5 flex flex-col gap-3"

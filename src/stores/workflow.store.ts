@@ -48,23 +48,45 @@ export const useWorkflowStore = create<WorkflowState>((set, get) => ({
     }),
 
   revealNode: (nodeId) =>
-    set((state) => ({
-      nodes: state.nodes.map((n) => (n.id === nodeId ? { ...n, isRevealed: true } : n)),
-    })),
-
-  addConnection: (conn) =>
     set((state) => {
-      const id = `conn-${++connCounter}`
+      const updatedNodes = state.nodes.map((n) =>
+        n.id === nodeId ? { ...n, isRevealed: true } : n
+      )
+      // Auto-reveal connections where both endpoints are now revealed
+      const updatedConnections = state.connections.map((c) => {
+        if (c.isRevealed) return c
+        const fromRevealed = updatedNodes.find((n) => n.id === c.from)?.isRevealed
+        const toRevealed = updatedNodes.find((n) => n.id === c.to)?.isRevealed
+        if (fromRevealed && toRevealed) {
+          return { ...c, isRevealed: true }
+        }
+        return c
+      })
+      return { nodes: updatedNodes, connections: updatedConnections }
+    }),
+
+  addConnection: (conn) => {
+    const id = `conn-${++connCounter}`
+    set((state) => ({
+      connections: [
+        ...state.connections,
+        { id, from: conn.from, to: conn.to, label: conn.label, isRevealed: false },
+      ],
+    }))
+    // Auto-reveal connection after delay (gives nodes time to reveal first)
+    setTimeout(() => {
+      const state = get()
       const fromNode = state.nodes.find((n) => n.id === conn.from)
       const toNode = state.nodes.find((n) => n.id === conn.to)
-      const isRevealed = !!(fromNode?.isRevealed && toNode?.isRevealed)
-      return {
-        connections: [
-          ...state.connections,
-          { id, from: conn.from, to: conn.to, label: conn.label, isRevealed },
-        ],
+      if (fromNode?.isRevealed && toNode?.isRevealed) {
+        set((s) => ({
+          connections: s.connections.map((c) =>
+            c.id === id ? { ...c, isRevealed: true } : c
+          ),
+        }))
       }
-    }),
+    }, 600)
+  },
 
   revealConnection: (connId) =>
     set((state) => ({
@@ -86,5 +108,8 @@ export const useWorkflowStore = create<WorkflowState>((set, get) => ({
       nodes: state.nodes.map((n) => (n.id === nodeId ? { ...n, x, y } : n)),
     })),
 
-  reset: () => set({ nodes: [], connections: [], commentary: null }),
+  reset: () => {
+    connCounter = 0
+    set({ nodes: [], connections: [], commentary: null })
+  },
 }))

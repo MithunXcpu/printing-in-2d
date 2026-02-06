@@ -30,7 +30,7 @@ export function useScreenCapture(): ScreenCaptureResult {
 
     try {
       const stream = await navigator.mediaDevices.getDisplayMedia({
-        video: { displaySurface: 'browser' },
+        video: true,
         audio: false,
       })
 

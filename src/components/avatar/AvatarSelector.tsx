@@ -1,5 +1,6 @@
 'use client'
 
+import { motion } from 'framer-motion'
 import { AvatarCard } from './AvatarCard'
 import { AVATAR_PERSONALITIES } from '@/lib/avatar-config'
 import type { AvatarKey } from '@/lib/types'
@@ -10,9 +11,12 @@ interface AvatarSelectorProps {
 
 export function AvatarSelector({ onSelect }: AvatarSelectorProps) {
   return (
-    <div className="flex flex-col items-center gap-12 px-10 py-10">
+    <div className="flex flex-col items-center gap-14 px-10 py-12">
       <div className="text-center">
-        <div
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.5 }}
           className="mb-4"
           style={{
             fontFamily: 'var(--font-jetbrains-mono), JetBrains Mono, monospace',
@@ -23,29 +27,35 @@ export function AvatarSelector({ onSelect }: AvatarSelectorProps) {
           }}
         >
           Step 1 of 5 — Choose your guide
-        </div>
-        <h1
+        </motion.div>
+        <motion.h1
+          initial={{ opacity: 0, y: 16 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.1 }}
           className="mb-3"
           style={{
             fontFamily: 'var(--font-fraunces), Fraunces, serif',
-            fontSize: 'clamp(2rem, 4.5vw, 3.2rem)',
+            fontSize: 'clamp(2rem, 4.5vw, 3.4rem)',
             letterSpacing: '-0.03em',
           }}
         >
           Who should{' '}
-          <em className="italic font-light" style={{ color: 'var(--green-300)' }}>
+          <em className="italic font-light text-gradient">
             build with you?
           </em>
-        </h1>
-        <p
-          className="font-light mx-auto leading-[1.6] max-w-[480px]"
+        </motion.h1>
+        <motion.p
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.5, delay: 0.2 }}
+          className="font-light mx-auto leading-relaxed max-w-[500px]"
           style={{ fontSize: '1.05rem', color: 'var(--ink-20)' }}
         >
           Each avatar has a different approach to understanding your problem and designing your micro tool.
-        </p>
+        </motion.p>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 max-w-[920px] w-full">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 max-w-[960px] w-full">
         {Object.values(AVATAR_PERSONALITIES).map((avatar, index) => (
           <AvatarCard
             key={avatar.key}

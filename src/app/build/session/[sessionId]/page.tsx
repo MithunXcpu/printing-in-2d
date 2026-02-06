@@ -185,7 +185,7 @@ export default function SessionPage() {
       <main
         className="pt-14 h-screen grid"
         style={{
-          gridTemplateColumns: '1fr 1fr',
+          gridTemplateColumns: '1fr 1px 1fr',
         }}
       >
         <ChatPanel
@@ -222,6 +222,12 @@ export default function SessionPage() {
               color={avatar.color}
             />
           }
+        />
+        {/* Glass divider */}
+        <div
+          style={{
+            background: 'linear-gradient(to bottom, transparent, rgba(255,255,255,.06) 20%, rgba(255,255,255,.06) 80%, transparent)',
+          }}
         />
         <div className="relative">
           <WorkflowDiagram avatar={avatar} />

@@ -1,11 +1,12 @@
 @import "tailwindcss";
 
 /* ═══════════════════════════════════════
-   DESIGN SYSTEM — Ported from Printing in 2D
+   DESIGN SYSTEM — Printing in 2D v2
+   Premium dark UI · Glass · Motion
    ═══════════════════════════════════════ */
 
 :root {
-  /* Brand Colors */
+  /* Brand Colors — green primary */
   --white: #fafcf8;
   --off-white: #f3f6ef;
   --cream: #eef2e8;
@@ -18,19 +19,28 @@
   --green-600: #1a5c08;
 
   /* Ink (dark) palette */
-  --ink: #0d1208;
-  --ink-80: #1e2518;
-  --ink-60: #3a4233;
+  --ink: #0a0f06;
+  --ink-90: #111a0b;
+  --ink-80: #1a2312;
+  --ink-60: #2d3626;
   --ink-40: #6b7363;
   --ink-20: #9ca494;
 
   /* Radius tokens */
-  --radius: 16px;
-  --radius-lg: 24px;
+  --radius: 20px;
+  --radius-lg: 28px;
+  --radius-xl: 36px;
+
+  /* Glass tokens */
+  --glass-bg: rgba(255, 255, 255, 0.03);
+  --glass-bg-hover: rgba(255, 255, 255, 0.06);
+  --glass-border: rgba(255, 255, 255, 0.08);
+  --glass-border-hover: rgba(255, 255, 255, 0.14);
+  --glass-blur: 20px;
 
   /* Dynamic avatar color (set via JS) */
-  --avatar-color: #2d8014;
-  --avatar-glow: rgba(45, 128, 20, 0.15);
+  --avatar-color: #3d9e1c;
+  --avatar-glow: rgba(61, 158, 28, 0.15);
 }
 
 @theme inline {
@@ -54,7 +64,7 @@ body {
 h1, h2, h3 {
   font-family: var(--font-serif), 'Fraunces', serif;
   font-weight: 600;
-  line-height: 1.15;
+  line-height: 1.1;
 }
 
 /* ── TEXTURE OVERLAY ── */
@@ -63,20 +73,50 @@ h1, h2, h3 {
   inset: 0;
   pointer-events: none;
   z-index: 0;
-  opacity: 0.08;
-  background-image: radial-gradient(circle at 1px 1px, rgba(255, 255, 255, 0.12) 1px, transparent 0);
-  background-size: 32px 32px;
+  opacity: 0.04;
+  background-image: radial-gradient(circle at 1px 1px, rgba(255, 255, 255, 0.15) 1px, transparent 0);
+  background-size: 28px 28px;
+}
+
+/* ── GLASS MORPHISM ── */
+.glass {
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  backdrop-filter: blur(var(--glass-blur));
+  -webkit-backdrop-filter: blur(var(--glass-blur));
+}
+
+.glass-hover:hover {
+  background: var(--glass-bg-hover);
+  border-color: var(--glass-border-hover);
+}
+
+.glass-strong {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
 }
 
 /* ── SCROLLBAR ── */
 ::-webkit-scrollbar { width: 4px; }
 ::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.08); border-radius: 2px; }
+::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.06); border-radius: 2px; }
 
 /* ── ANIMATIONS ── */
 @keyframes fadeUp {
-  from { opacity: 0; transform: translateY(18px); }
+  from { opacity: 0; transform: translateY(20px); }
   to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes scaleIn {
+  from { opacity: 0; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1); }
 }
 
 @keyframes orbSpin {
@@ -85,7 +125,7 @@ h1, h2, h3 {
 
 @keyframes onlinePulse {
   0%, 100% { opacity: 1; box-shadow: 0 0 0 0 var(--avatar-color); }
-  50% { opacity: 0.7; box-shadow: 0 0 0 6px transparent; }
+  50% { opacity: 0.7; box-shadow: 0 0 0 8px transparent; }
 }
 
 @keyframes msgIn {
@@ -107,6 +147,99 @@ h1, h2, h3 {
   to { stroke-dashoffset: 0; }
 }
 
+@keyframes gradientShift {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+@keyframes glowPulse {
+  0%, 100% { opacity: 0.4; }
+  50% { opacity: 0.8; }
+}
+
+@keyframes shimmer {
+  from { transform: translateX(-100%); }
+  to { transform: translateX(100%); }
+}
+
+@keyframes borderRotate {
+  to { --angle: 360deg; }
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-8px); }
+}
+
+@keyframes slideInRight {
+  from { opacity: 0; transform: translateX(16px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+/* ── ANIMATED GRADIENT MESH (hero background) ── */
+.gradient-mesh {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  z-index: 0;
+}
+
+.gradient-mesh::before {
+  content: '';
+  position: absolute;
+  width: 140%;
+  height: 140%;
+  top: -20%;
+  left: -20%;
+  background: radial-gradient(ellipse at 20% 50%, rgba(61, 158, 28, 0.12) 0%, transparent 50%),
+              radial-gradient(ellipse at 80% 20%, rgba(92, 184, 58, 0.08) 0%, transparent 50%),
+              radial-gradient(ellipse at 50% 80%, rgba(45, 128, 20, 0.06) 0%, transparent 50%);
+  animation: gradientShift 20s ease infinite;
+  background-size: 200% 200%;
+}
+
+.gradient-mesh::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at center, transparent 30%, var(--ink) 70%);
+}
+
+/* ── GLOW EFFECTS ── */
+.glow-green {
+  box-shadow: 0 0 40px rgba(61, 158, 28, 0.15), 0 0 80px rgba(61, 158, 28, 0.05);
+}
+
+.glow-green-strong {
+  box-shadow: 0 0 60px rgba(61, 158, 28, 0.25), 0 0 120px rgba(61, 158, 28, 0.08);
+}
+
+/* ── ANIMATED BORDER (for Pro card etc) ── */
+@property --angle {
+  syntax: '<angle>';
+  initial-value: 0deg;
+  inherits: false;
+}
+
+.border-gradient {
+  position: relative;
+  border: none;
+}
+
+.border-gradient::before {
+  content: '';
+  position: absolute;
+  inset: -1px;
+  border-radius: inherit;
+  padding: 1.5px;
+  background: conic-gradient(from var(--angle, 0deg), var(--green-400), var(--green-200), var(--green-400));
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  animation: borderRotate 4s linear infinite;
+}
+
 /* ── UTILITY CLASSES ── */
 .fade-in {
   opacity: 0;
@@ -116,4 +249,16 @@ h1, h2, h3 {
 .fade-in.show {
   opacity: 1;
   transform: translateY(0);
+}
+
+.text-gradient {
+  background: linear-gradient(135deg, var(--green-200), var(--green-400));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.mono {
+  font-family: var(--font-jetbrains-mono), 'JetBrains Mono', monospace;
+  letter-spacing: 0.04em;
 }

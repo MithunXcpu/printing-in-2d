@@ -21,10 +21,10 @@ export default function ContactPage() {
           </Link>
           <Link
             href="/"
-            className="text-sm transition-colors"
+            className="text-sm transition-colors hover:text-white"
             style={{ color: "var(--ink-20)" }}
           >
-            &larr; Back
+            ← Back
           </Link>
         </div>
       </nav>
@@ -39,7 +39,7 @@ export default function ContactPage() {
               style={{ fontFamily: "var(--font-fraunces), Fraunces, serif" }}
             >
               Get in{" "}
-              <em className="italic font-light" style={{ color: "var(--green-300)" }}>
+              <em className="italic font-light text-gradient">
                 Touch.
               </em>
             </h1>
@@ -58,16 +58,18 @@ export default function ContactPage() {
           <form
             action="https://formspree.io/f/xplaceholder"
             method="POST"
-            className="space-y-6"
+            className="space-y-5 glass p-8 rounded-3xl"
+            style={{ borderRadius: "var(--radius-xl)" }}
           >
             {/* Name */}
             <div>
               <label
                 htmlFor="name"
-                className="block text-sm font-medium mb-2"
+                className="block text-xs font-medium mb-2 uppercase"
                 style={{
-                  color: "var(--ink-20)",
-                  fontFamily: "var(--font-outfit), Outfit, sans-serif",
+                  color: "var(--ink-40)",
+                  fontFamily: "var(--font-jetbrains-mono), JetBrains Mono, monospace",
+                  letterSpacing: "0.08em",
                 }}
               >
                 Name
@@ -78,10 +80,10 @@ export default function ContactPage() {
                 name="name"
                 required
                 placeholder="Your name"
-                className="w-full px-4 py-3 rounded-2xl text-sm outline-none transition-all"
+                className="w-full px-4 py-3 rounded-xl text-sm outline-none transition-all focus:ring-1"
                 style={{
-                  background: "var(--ink-80)",
-                  border: "1px solid var(--ink-60)",
+                  background: "rgba(255,255,255,.03)",
+                  border: "1px solid rgba(255,255,255,.08)",
                   color: "var(--white)",
                   fontFamily: "var(--font-outfit), Outfit, sans-serif",
                 }}
@@ -92,10 +94,11 @@ export default function ContactPage() {
             <div>
               <label
                 htmlFor="email"
-                className="block text-sm font-medium mb-2"
+                className="block text-xs font-medium mb-2 uppercase"
                 style={{
-                  color: "var(--ink-20)",
-                  fontFamily: "var(--font-outfit), Outfit, sans-serif",
+                  color: "var(--ink-40)",
+                  fontFamily: "var(--font-jetbrains-mono), JetBrains Mono, monospace",
+                  letterSpacing: "0.08em",
                 }}
               >
                 Email
@@ -106,10 +109,10 @@ export default function ContactPage() {
                 name="email"
                 required
                 placeholder="you@example.com"
-                className="w-full px-4 py-3 rounded-2xl text-sm outline-none transition-all"
+                className="w-full px-4 py-3 rounded-xl text-sm outline-none transition-all"
                 style={{
-                  background: "var(--ink-80)",
-                  border: "1px solid var(--ink-60)",
+                  background: "rgba(255,255,255,.03)",
+                  border: "1px solid rgba(255,255,255,.08)",
                   color: "var(--white)",
                   fontFamily: "var(--font-outfit), Outfit, sans-serif",
                 }}
@@ -120,10 +123,11 @@ export default function ContactPage() {
             <div>
               <label
                 htmlFor="phone"
-                className="block text-sm font-medium mb-2"
+                className="block text-xs font-medium mb-2 uppercase"
                 style={{
-                  color: "var(--ink-20)",
-                  fontFamily: "var(--font-outfit), Outfit, sans-serif",
+                  color: "var(--ink-40)",
+                  fontFamily: "var(--font-jetbrains-mono), JetBrains Mono, monospace",
+                  letterSpacing: "0.08em",
                 }}
               >
                 Phone Number
@@ -133,10 +137,10 @@ export default function ContactPage() {
                 id="phone"
                 name="phone"
                 placeholder="+1 (555) 000-0000"
-                className="w-full px-4 py-3 rounded-2xl text-sm outline-none transition-all"
+                className="w-full px-4 py-3 rounded-xl text-sm outline-none transition-all"
                 style={{
-                  background: "var(--ink-80)",
-                  border: "1px solid var(--ink-60)",
+                  background: "rgba(255,255,255,.03)",
+                  border: "1px solid rgba(255,255,255,.08)",
                   color: "var(--white)",
                   fontFamily: "var(--font-outfit), Outfit, sans-serif",
                 }}
@@ -147,10 +151,11 @@ export default function ContactPage() {
             <div>
               <label
                 htmlFor="message"
-                className="block text-sm font-medium mb-2"
+                className="block text-xs font-medium mb-2 uppercase"
                 style={{
-                  color: "var(--ink-20)",
-                  fontFamily: "var(--font-outfit), Outfit, sans-serif",
+                  color: "var(--ink-40)",
+                  fontFamily: "var(--font-jetbrains-mono), JetBrains Mono, monospace",
+                  letterSpacing: "0.08em",
                 }}
               >
                 Message
@@ -161,10 +166,10 @@ export default function ContactPage() {
                 required
                 rows={5}
                 placeholder="Tell me about your project or idea..."
-                className="w-full px-4 py-3 rounded-2xl text-sm outline-none transition-all resize-vertical"
+                className="w-full px-4 py-3 rounded-xl text-sm outline-none transition-all resize-vertical"
                 style={{
-                  background: "var(--ink-80)",
-                  border: "1px solid var(--ink-60)",
+                  background: "rgba(255,255,255,.03)",
+                  border: "1px solid rgba(255,255,255,.08)",
                   color: "var(--white)",
                   fontFamily: "var(--font-outfit), Outfit, sans-serif",
                 }}
@@ -174,14 +179,15 @@ export default function ContactPage() {
             {/* Submit */}
             <button
               type="submit"
-              className="w-full py-3.5 rounded-2xl text-sm font-semibold transition-opacity hover:opacity-90"
+              className="w-full py-3.5 rounded-xl text-sm font-semibold transition-all hover:translate-y-[-1px]"
               style={{
-                background: "var(--green-300)",
-                color: "var(--ink)",
+                background: "var(--green-400)",
+                color: "#fff",
+                boxShadow: "0 4px 20px rgba(61,158,28,.25)",
                 fontFamily: "var(--font-outfit), Outfit, sans-serif",
               }}
             >
-              Send Message
+              Send Message →
             </button>
           </form>
         </div>

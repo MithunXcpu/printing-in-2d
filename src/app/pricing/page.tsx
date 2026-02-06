@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
+import { motion } from 'framer-motion'
 import { TopBar } from '@/components/layout/TopBar'
 
 const plans = [
@@ -35,7 +36,7 @@ const plans = [
       'Priority support',
     ],
     cta: 'Upgrade to Pro',
-    href: null, // triggers checkout
+    href: null,
     highlight: true,
   },
 ]
@@ -69,35 +70,64 @@ export default function PricingPage() {
     <>
       <TopBar status="Choose your plan" />
       <main className="pt-20 min-h-screen flex flex-col items-center px-8 pb-16">
-        <h1
-          className="text-4xl md:text-5xl tracking-tight mb-3 text-center"
-          style={{ fontFamily: 'var(--font-fraunces), Fraunces, serif', letterSpacing: '-0.03em' }}
+        <motion.div
+          initial={{ opacity: 0, y: 16 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+          className="text-center"
         >
-          Simple pricing
-        </h1>
-        <p
-          className="text-base font-light mb-12 text-center"
-          style={{ color: 'var(--ink-20)' }}
-        >
-          Start free. Upgrade when you need more.
-        </p>
+          <h1
+            className="text-4xl md:text-5xl tracking-tight mb-3"
+            style={{ fontFamily: 'var(--font-fraunces), Fraunces, serif', letterSpacing: '-0.03em' }}
+          >
+            Simple{' '}
+            <em className="italic font-light text-gradient">pricing</em>
+          </h1>
+          <p
+            className="text-base font-light mb-14"
+            style={{ color: 'var(--ink-20)' }}
+          >
+            Start free. Upgrade when you need more.
+          </p>
+        </motion.div>
 
         <div className="grid md:grid-cols-2 gap-6 max-w-3xl w-full">
-          {plans.map((plan) => (
-            <div
+          {plans.map((plan, i) => (
+            <motion.div
               key={plan.name}
-              className="rounded-2xl p-8 flex flex-col"
+              initial={{ opacity: 0, y: 24 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: i * 0.15 }}
+              className={`rounded-3xl p-8 flex flex-col relative overflow-hidden ${
+                plan.highlight ? 'border-gradient' : 'glass'
+              }`}
               style={{
                 background: plan.highlight
-                  ? 'linear-gradient(135deg, rgba(45,128,20,.15), rgba(45,128,20,.05))'
-                  : 'rgba(255,255,255,.03)',
-                border: plan.highlight
-                  ? '1px solid rgba(45,128,20,.4)'
-                  : '1px solid rgba(255,255,255,.06)',
+                  ? 'linear-gradient(135deg, rgba(61,158,28,.12), rgba(61,158,28,.04))'
+                  : undefined,
+                borderRadius: 'var(--radius-lg)',
               }}
             >
+              {/* Most Popular badge */}
+              {plan.highlight && (
+                <div
+                  className="absolute top-4 right-4 px-3 py-1 rounded-full text-xs font-semibold"
+                  style={{
+                    background: 'rgba(61,158,28,.15)',
+                    color: 'var(--green-300)',
+                    border: '1px solid rgba(61,158,28,.25)',
+                    fontFamily: 'var(--font-jetbrains-mono), JetBrains Mono, monospace',
+                    fontSize: '0.6rem',
+                    letterSpacing: '0.06em',
+                    textTransform: 'uppercase',
+                  }}
+                >
+                  Most Popular
+                </div>
+              )}
+
               <div
-                className="text-sm font-semibold mb-2"
+                className="text-sm font-semibold mb-3"
                 style={{
                   fontFamily: 'var(--font-jetbrains-mono), JetBrains Mono, monospace',
                   color: plan.highlight ? 'var(--green-300)' : 'var(--ink-20)',
@@ -106,32 +136,41 @@ export default function PricingPage() {
               >
                 {plan.name}
               </div>
-              <div className="flex items-baseline gap-1 mb-2">
-                <span className="text-4xl font-bold text-white">{plan.price}</span>
+              <div className="flex items-baseline gap-1 mb-3">
+                <span className="text-5xl font-bold text-white">{plan.price}</span>
                 <span style={{ color: 'var(--ink-20)', fontSize: '0.85rem' }}>{plan.period}</span>
               </div>
-              <p className="text-sm mb-6" style={{ color: 'var(--ink-20)', lineHeight: 1.5 }}>
+              <p className="text-sm mb-8" style={{ color: 'var(--ink-20)', lineHeight: 1.6 }}>
                 {plan.description}
               </p>
-              <ul className="flex-1 mb-8 space-y-2.5">
-                {plan.features.map((f) => (
-                  <li
+              <ul className="flex-1 mb-8 space-y-3">
+                {plan.features.map((f, fi) => (
+                  <motion.li
                     key={f}
-                    className="flex items-center gap-2 text-sm"
+                    initial={{ opacity: 0, x: -8 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ duration: 0.3, delay: 0.4 + fi * 0.06 }}
+                    className="flex items-center gap-2.5 text-sm"
                     style={{ color: 'rgba(255,255,255,.8)' }}
                   >
-                    <span style={{ color: 'var(--green-300)' }}>&#x2713;</span>
+                    <span
+                      className="w-5 h-5 rounded-full flex items-center justify-center text-xs flex-shrink-0"
+                      style={{
+                        background: plan.highlight ? 'rgba(61,158,28,.15)' : 'rgba(255,255,255,.05)',
+                        color: 'var(--green-300)',
+                      }}
+                    >
+                      ✓
+                    </span>
                     {f}
-                  </li>
+                  </motion.li>
                 ))}
               </ul>
               {plan.href ? (
                 <Link
                   href={plan.href}
-                  className="w-full text-center py-3 rounded-full font-semibold text-sm transition-all hover:translate-y-[-1px]"
+                  className="w-full text-center py-3 rounded-full font-semibold text-sm transition-all hover:translate-y-[-1px] block glass glass-hover"
                   style={{
-                    background: 'rgba(255,255,255,.06)',
-                    border: '1px solid rgba(255,255,255,.1)',
                     color: 'rgba(255,255,255,.7)',
                   }}
                 >
@@ -141,17 +180,17 @@ export default function PricingPage() {
                 <button
                   onClick={handleUpgrade}
                   disabled={loading}
-                  className="w-full py-3 rounded-full font-semibold text-sm transition-all hover:translate-y-[-1px] cursor-pointer disabled:opacity-50"
+                  className="w-full py-3.5 rounded-full font-semibold text-sm transition-all hover:translate-y-[-2px] cursor-pointer disabled:opacity-50"
                   style={{
                     background: 'var(--green-400)',
                     color: '#fff',
-                    boxShadow: '0 4px 20px rgba(45,128,20,.3)',
+                    boxShadow: '0 4px 24px rgba(61,158,28,.3)',
                   }}
                 >
                   {loading ? 'Redirecting...' : plan.cta}
                 </button>
               )}
-            </div>
+            </motion.div>
           ))}
         </div>
       </main>

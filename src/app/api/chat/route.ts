@@ -131,6 +131,7 @@ export async function POST(request: Request) {
     max_tokens: 2048,
     system: systemPrompt,
     tools: WORKFLOW_TOOLS,
+    tool_choice: { type: 'auto' },
     messages: messages as Anthropic.MessageParam[],
   })
 

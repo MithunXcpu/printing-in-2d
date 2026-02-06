@@ -151,7 +151,7 @@ export function TavusAvatar({ avatar, onConnected, onError, onSpeak }: TavusAvat
         <iframe
           src={conversationUrl}
           className="w-full h-full border-0"
-          allow="autoplay; encrypted-media"
+          allow="microphone; autoplay; encrypted-media"
           style={{
             borderRadius: '0',
             background: '#0d1208',

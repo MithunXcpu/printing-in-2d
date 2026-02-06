@@ -5,7 +5,7 @@ export const AVATAR_PERSONALITIES: Record<string, AvatarPersonality> = {
     key: 'oracle',
     name: 'Oracle',
     emoji: '\u{1F9E0}',
-    photoUrl: '/avatars/oracle.jpg',
+    // photoUrl removed — Tavus replica is the visual identity now
     trait: 'Strategic & analytical. Asks the hard questions. Has opinions.',
     tags: ['Industry patterns', 'Opinionated', 'Pushes back'],
     color: '#2d8014',
@@ -17,15 +17,15 @@ export const AVATAR_PERSONALITIES: Record<string, AvatarPersonality> = {
     // Ready Player Me — placeholder (swap with your own RPM avatar ID)
     modelUrl: 'https://models.readyplayer.me/6460d95f9ae8cb350c14e7d4.glb?morphTargets=ARKit,Oculus+Visemes',
     modelBody: 'M',
-    // Tavus: James — professional, authoritative male
-    tavusReplicaId: 'r92debe21318',
+    // Tavus: Benjamin — professional, authoritative Black male
+    tavusReplicaId: 'r5c3a5978cb9',
     tavusPersonaId: undefined,
   },
   spark: {
     key: 'spark',
     name: 'Spark',
     emoji: '\u26A1',
-    photoUrl: '/avatars/spark.jpg',
+    // photoUrl removed — Tavus replica is the visual identity now
     trait: 'Creative & lateral. Sees connections nobody else does.',
     tags: ['What-if scenarios', 'Pattern finder', 'Lateral'],
     color: '#d97706',
@@ -37,7 +37,7 @@ export const AVATAR_PERSONALITIES: Record<string, AvatarPersonality> = {
     // Ready Player Me — placeholder (swap with your own RPM avatar ID)
     modelUrl: 'https://models.readyplayer.me/6460d95f9ae8cb350c14e7d4.glb?morphTargets=ARKit,Oculus+Visemes',
     modelBody: 'F',
-    // Tavus: Luna — creative, energetic female
+    // Tavus: Luna — creative, energetic Latina female
     tavusReplicaId: 'r9d30b0e55ac',
     tavusPersonaId: undefined,
   },
@@ -45,7 +45,7 @@ export const AVATAR_PERSONALITIES: Record<string, AvatarPersonality> = {
     key: 'forge',
     name: 'Forge',
     emoji: '\u{1F528}',
-    photoUrl: '/avatars/forge.jpg',
+    // photoUrl removed — Tavus replica is the visual identity now
     trait: 'Direct & no-nonsense. Ships fast. Cuts the waste.',
     tags: ['No fluff', 'Fast decisions', 'Ship it'],
     color: '#6366f1',
@@ -57,7 +57,7 @@ export const AVATAR_PERSONALITIES: Record<string, AvatarPersonality> = {
     // Ready Player Me — placeholder (swap with your own RPM avatar ID)
     modelUrl: 'https://models.readyplayer.me/6460d95f9ae8cb350c14e7d4.glb?morphTargets=ARKit,Oculus+Visemes',
     modelBody: 'M',
-    // Tavus: Raj — direct, no-nonsense male
+    // Tavus: Raj — direct, no-nonsense Indian male
     tavusReplicaId: 'ra066ab28864',
     tavusPersonaId: undefined,
   },
@@ -65,7 +65,7 @@ export const AVATAR_PERSONALITIES: Record<string, AvatarPersonality> = {
     key: 'flow',
     name: 'Flow',
     emoji: '\u{1F30A}',
-    photoUrl: '/avatars/flow.jpg',
+    // photoUrl removed — Tavus replica is the visual identity now
     trait: 'Patient & thorough. Takes it step by step. Nothing missed.',
     tags: ['Step by step', 'Calm guidance', 'Thorough'],
     color: '#06b6d4',
@@ -77,8 +77,8 @@ export const AVATAR_PERSONALITIES: Record<string, AvatarPersonality> = {
     // Ready Player Me — placeholder (swap with your own RPM avatar ID)
     modelUrl: 'https://models.readyplayer.me/6460d95f9ae8cb350c14e7d4.glb?morphTargets=ARKit,Oculus+Visemes',
     modelBody: 'F',
-    // Tavus: Rose — calm, patient female
-    tavusReplicaId: 'r1af76e94d00',
+    // Tavus: Anna — calm, patient female
+    tavusReplicaId: 'rbe81aa309b5',
     tavusPersonaId: undefined,
   },
 }

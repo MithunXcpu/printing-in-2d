@@ -185,7 +185,7 @@ export default function SessionPage() {
       <main
         className="pt-14 h-screen grid"
         style={{
-          gridTemplateColumns: '380px 1fr',
+          gridTemplateColumns: '1fr 1fr',
         }}
       >
         <ChatPanel

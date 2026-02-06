@@ -28,11 +28,15 @@ export async function POST(request: Request) {
         ...(replicaId ? { replica_id: replicaId } : {}),
         ...(personaId ? { persona_id: personaId } : {}),
         conversation_name: conversationName || 'Printing in 2D Session',
-        // Enable conversational mode
+        // Disable Tavus's built-in conversational AI — we control speech via speak() endpoint
+        conversational_context:
+          'You are a silent video avatar. Do NOT speak on your own. Only speak when explicitly given text via the injection API. Never initiate conversation.',
+        custom_greeting: '',
         properties: {
           max_call_duration: 1800, // 30 minutes max
-          enable_recording: true,
+          enable_recording: false,
           language: 'english',
+          apply_greenscreen: false,
         },
       }),
     })

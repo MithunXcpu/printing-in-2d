@@ -60,7 +60,7 @@ export function TavusAvatar({ avatar, onConnected, onError, onSpeak }: TavusAvat
   // Loading state
   if (isLoading) {
     return (
-      <div className="w-full flex flex-col items-center justify-center gap-3" style={{ height: '220px' }}>
+      <div className="w-full flex flex-col items-center justify-center gap-3" style={{ height: '280px' }}>
         <motion.div
           className="w-24 h-24 rounded-full overflow-hidden"
           animate={{
@@ -142,7 +142,7 @@ export function TavusAvatar({ avatar, onConnected, onError, onSpeak }: TavusAvat
     <div
       className="w-full overflow-hidden relative"
       style={{
-        height: '220px',
+        height: '280px',
         borderRadius: '0',
         background: '#0d1208',
       }}
@@ -151,7 +151,7 @@ export function TavusAvatar({ avatar, onConnected, onError, onSpeak }: TavusAvat
         <iframe
           src={conversationUrl}
           className="w-full h-full border-0"
-          allow="camera; microphone; autoplay; encrypted-media; display-capture"
+          allow="autoplay; encrypted-media"
           style={{
             borderRadius: '0',
             background: '#0d1208',

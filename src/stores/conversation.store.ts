@@ -8,7 +8,7 @@ interface ConversationState {
   interviewStage: InterviewStage
   suggestions: string[]
 
-  addMessage: (msg: Omit<Message, 'id' | 'timestamp'> & { imageUrl?: string }) => void
+  addMessage: (msg: Omit<Message, 'id' | 'timestamp'> & { imageUrl?: string; stateImageUrl?: string }) => void
   updateLastAssistantMessage: (content: string) => void
   setStreaming: (streaming: boolean) => void
   setCurrentStreamingText: (text: string) => void
@@ -23,7 +23,7 @@ export const useConversationStore = create<ConversationState>((set) => ({
   messages: [],
   isStreaming: false,
   currentStreamingText: '',
-  interviewStage: 'outcome',
+  interviewStage: 'current_state_1',
   suggestions: [],
 
   addMessage: (msg) =>

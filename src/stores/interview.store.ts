@@ -20,7 +20,7 @@ const initialProfile: UserProfile = {
 }
 
 export const useInterviewStore = create<InterviewState>((set) => ({
-  stage: 'outcome',
+  stage: 'current_state_1',
   profile: { ...initialProfile },
   onboardingComplete: false,
 
@@ -32,5 +32,5 @@ export const useInterviewStore = create<InterviewState>((set) => ({
   setStage: (stage) => set({ stage }),
   setOnboardingComplete: (onboardingComplete) => set({ onboardingComplete }),
 
-  reset: () => set({ stage: 'outcome', profile: { ...initialProfile }, onboardingComplete: false }),
+  reset: () => set({ stage: 'current_state_1', profile: { ...initialProfile }, onboardingComplete: false }),
 }))

@@ -11,12 +11,23 @@ interface WorkflowDiagramProps {
 }
 
 const STAGE_PROGRESS: Record<string, number> = {
-  outcome: 10,
-  data_sources: 35,
-  processing: 60,
-  outputs: 85,
-  review: 100,
-  complete: 100,
+  current_state_1: 5,
+  current_state_2: 10,
+  current_state_3: 15,
+  current_state_4: 20,
+  current_state_5: 25,
+  generate_current: 30,
+  validate_current: 35,
+  future_state_1: 40,
+  future_state_2: 45,
+  future_state_3: 50,
+  future_state_4: 55,
+  future_state_5: 60,
+  generate_future: 65,
+  validate_future: 70,
+  compare: 80,
+  refine: 90,
+  orchestrate: 100,
 }
 
 export function WorkflowDiagram({ avatar }: WorkflowDiagramProps) {
@@ -61,7 +72,7 @@ export function WorkflowDiagram({ avatar }: WorkflowDiagramProps) {
             background: 'rgba(255,255,255,.03)',
           }}
         >
-          untitled.p2d
+          {interviewStage.replace(/_/g, ' ')}
         </div>
       </div>
 

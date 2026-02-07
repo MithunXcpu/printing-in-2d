@@ -1,5 +1,6 @@
 'use client'
 
+import Image from 'next/image'
 import type { Message } from '@/lib/types'
 
 interface MessageBubbleProps {
@@ -63,12 +64,16 @@ export function MessageBubble({ message, avatarColor }: MessageBubbleProps) {
         </div>
       )}
       {message.imageUrl && (
-        <img
+        <Image
           src={message.imageUrl}
           alt="Screenshot"
+          width={400}
+          height={200}
+          unoptimized
           className="rounded-lg mb-2 max-w-full"
           style={{
             maxHeight: '200px',
+            width: 'auto',
             objectFit: 'contain',
             border: '1px solid rgba(255,255,255,.1)',
           }}

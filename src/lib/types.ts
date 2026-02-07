@@ -1,12 +1,23 @@
 export type AvatarKey = 'oracle' | 'spark' | 'forge' | 'flow'
 
 export type InterviewStage =
-  | 'outcome'
-  | 'data_sources'
-  | 'processing'
-  | 'outputs'
-  | 'review'
-  | 'complete'
+  | 'current_state_1'
+  | 'current_state_2'
+  | 'current_state_3'
+  | 'current_state_4'
+  | 'current_state_5'
+  | 'generate_current'
+  | 'validate_current'
+  | 'future_state_1'
+  | 'future_state_2'
+  | 'future_state_3'
+  | 'future_state_4'
+  | 'future_state_5'
+  | 'generate_future'
+  | 'validate_future'
+  | 'compare'
+  | 'refine'
+  | 'orchestrate'
 
 export type WorkflowNodeType = 'source' | 'processor' | 'decision' | 'output' | 'ai'
 
@@ -36,6 +47,8 @@ export interface Message {
   content: string
   /** Base64 data URL for an attached screenshot/image */
   imageUrl?: string
+  /** Base64 data URL for a generated state image */
+  stateImageUrl?: string
   toolCalls?: ToolCall[]
   timestamp: number
 }

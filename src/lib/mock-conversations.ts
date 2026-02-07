@@ -54,7 +54,7 @@ const oracleSteps: MockChatStep[] = [
       "I want to predict which products will sell out before they actually do.",
       "I need a single dashboard that merges sales, weather, and inventory data."
     ],
-    toolCalls: [stageCall('outcome')],
+    toolCalls: [stageCall('current_state_1')],
   },
   {
     ai: "Good. That's a consolidation workflow — multiple data sources feeding one output. Where does your primary sales data live?",
@@ -65,7 +65,7 @@ const oracleSteps: MockChatStep[] = [
     ],
     toolCalls: [
       nodeCall(0),
-      stageCall('data_sources', 'Identifying workflow type — this is <strong>consolidation</strong>, not orchestration.'),
+      stageCall('current_state_2', 'Identifying workflow type — this is <strong>consolidation</strong>, not orchestration.'),
     ],
     commentary: "Identifying workflow type — this is <strong>consolidation</strong>, not orchestration.",
   },
@@ -79,6 +79,7 @@ const oracleSteps: MockChatStep[] = [
     toolCalls: [
       nodeCall(1),
       nodeCall(2),
+      stageCall('current_state_3', 'Mapping data sources — <strong>3 inputs</strong> identified so far.'),
     ],
     commentary: "Mapping data sources — <strong>3 inputs</strong> identified so far.",
   },
@@ -98,7 +99,7 @@ const oracleSteps: MockChatStep[] = [
       connCall(2, 4),
       connCall(3, 5),
       connCall(4, 5),
-      stageCall('processing', 'Building the processing layer — <strong>normalize, merge, forecast</strong>.'),
+      stageCall('current_state_4', 'Building the processing layer — <strong>normalize, merge, forecast</strong>.'),
     ],
     commentary: "Building the processing layer — <strong>normalize, merge, forecast</strong>.",
   },
@@ -116,7 +117,7 @@ const oracleSteps: MockChatStep[] = [
       connCall(5, 6),
       connCall(5, 7),
       connCall(5, 8),
-      stageCall('review', 'Connecting outputs — <strong>report, notify, dashboard</strong>. Workflow complete.'),
+      stageCall('current_state_5', 'Connecting outputs — <strong>report, notify, dashboard</strong>. Workflow complete.'),
     ],
     commentary: "Connecting outputs — <strong>report, notify, dashboard</strong>. Workflow complete.",
   },
@@ -133,7 +134,7 @@ const sparkSteps: MockChatStep[] = [
       "I want a single view that tells me exactly what to stock, where, and when.",
       "Basically I want to see the future of demand across all our locations."
     ],
-    toolCalls: [stageCall('outcome')],
+    toolCalls: [stageCall('current_state_1')],
   },
   {
     ai: "I love it. Here's what I'm hearing — you don't just want data, you want *signals*. What's your richest data source?",
@@ -144,7 +145,7 @@ const sparkSteps: MockChatStep[] = [
     ],
     toolCalls: [
       nodeCall(0),
-      stageCall('data_sources', 'Finding the signal source — the richest <strong>data stream</strong>.'),
+      stageCall('current_state_2', 'Finding the signal source — the richest <strong>data stream</strong>.'),
     ],
     commentary: "Finding the signal source — the richest <strong>data stream</strong>.",
   },
@@ -158,6 +159,7 @@ const sparkSteps: MockChatStep[] = [
     toolCalls: [
       nodeCall(1),
       nodeCall(2),
+      stageCall('current_state_3', 'Layering inputs — <strong>unconventional data sources</strong> unlock better predictions.'),
     ],
     commentary: "Layering inputs — <strong>unconventional data sources</strong> unlock better predictions.",
   },
@@ -177,7 +179,7 @@ const sparkSteps: MockChatStep[] = [
       connCall(2, 4),
       connCall(3, 5),
       connCall(4, 5),
-      stageCall('processing', 'Cross-pollination layer — <strong>smart merging beats dumb merging</strong>.'),
+      stageCall('current_state_4', 'Cross-pollination layer — <strong>smart merging beats dumb merging</strong>.'),
     ],
     commentary: "Cross-pollination layer — <strong>smart merging beats dumb merging</strong>.",
   },
@@ -195,7 +197,7 @@ const sparkSteps: MockChatStep[] = [
       connCall(5, 6),
       connCall(5, 7),
       connCall(5, 8),
-      stageCall('review', 'Output as <strong>triggers, not reports</strong>. The workflow is alive.'),
+      stageCall('current_state_5', 'Output as <strong>triggers, not reports</strong>. The workflow is alive.'),
     ],
     commentary: "Output as <strong>triggers, not reports</strong>. The workflow is alive.",
   },
@@ -212,7 +214,7 @@ const forgeSteps: MockChatStep[] = [
       "Predict stockouts before they happen. Need it running by end of month.",
       "Replace our manual forecasting process with something that just runs."
     ],
-    toolCalls: [stageCall('outcome')],
+    toolCalls: [stageCall('current_state_1')],
   },
   {
     ai: "Clear. Source one — where's the sales data?",
@@ -223,7 +225,7 @@ const forgeSteps: MockChatStep[] = [
     ],
     toolCalls: [
       nodeCall(0),
-      stageCall('data_sources', 'Source locked — <strong>POS data</strong>.'),
+      stageCall('current_state_2', 'Source locked — <strong>POS data</strong>.'),
     ],
     commentary: "Source locked — <strong>POS data</strong>.",
   },
@@ -237,6 +239,7 @@ const forgeSteps: MockChatStep[] = [
     toolCalls: [
       nodeCall(1),
       nodeCall(2),
+      stageCall('current_state_3', 'All <strong>3 sources identified</strong>. Moving to processing.'),
     ],
     commentary: "All <strong>3 sources identified</strong>. Moving to processing.",
   },
@@ -256,7 +259,7 @@ const forgeSteps: MockChatStep[] = [
       connCall(2, 4),
       connCall(3, 5),
       connCall(4, 5),
-      stageCall('processing', '<strong>Three-stage processing</strong> pipeline mapped.'),
+      stageCall('current_state_4', '<strong>Three-stage processing</strong> pipeline mapped.'),
     ],
     commentary: "<strong>Three-stage processing</strong> pipeline mapped.",
   },
@@ -274,7 +277,7 @@ const forgeSteps: MockChatStep[] = [
       connCall(5, 6),
       connCall(5, 7),
       connCall(5, 8),
-      stageCall('review', '<strong>Done.</strong> Full pipeline: 3 sources → 3 processors → 3 outputs.'),
+      stageCall('current_state_5', '<strong>Done.</strong> Full pipeline: 3 sources → 3 processors → 3 outputs.'),
     ],
     commentary: "<strong>Done.</strong> Full pipeline: 3 sources → 3 processors → 3 outputs.",
   },
@@ -291,7 +294,7 @@ const flowSteps: MockChatStep[] = [
       "Email. Usually there's a report from the warehouse about inventory levels.",
       "Honestly? A spreadsheet I've been maintaining for three years."
     ],
-    toolCalls: [stageCall('outcome')],
+    toolCalls: [stageCall('current_state_1')],
   },
   {
     ai: "That's a great starting point. So the POS system is your first source of truth. What do you do with that data next?",
@@ -302,7 +305,7 @@ const flowSteps: MockChatStep[] = [
     ],
     toolCalls: [
       nodeCall(0),
-      stageCall('data_sources', 'First source identified — <strong>POS data</strong>. Starting the map.'),
+      stageCall('current_state_2', 'First source identified — <strong>POS data</strong>. Starting the map.'),
     ],
     commentary: "First source identified — <strong>POS data</strong>. Starting the map.",
   },
@@ -316,6 +319,7 @@ const flowSteps: MockChatStep[] = [
     toolCalls: [
       nodeCall(1),
       nodeCall(2),
+      stageCall('current_state_3', 'Adding <strong>weather</strong> and <strong>inventory</strong> sources to the map.'),
     ],
     commentary: "Adding <strong>weather</strong> and <strong>inventory</strong> sources to the map.",
   },
@@ -335,7 +339,7 @@ const flowSteps: MockChatStep[] = [
       connCall(2, 4),
       connCall(3, 5),
       connCall(4, 5),
-      stageCall('processing', 'Building the middle layer — <strong>normalize → merge → forecast</strong>.'),
+      stageCall('current_state_4', 'Building the middle layer — <strong>normalize → merge → forecast</strong>.'),
     ],
     commentary: "Building the middle layer — <strong>normalize → merge → forecast</strong>.",
   },
@@ -353,7 +357,7 @@ const flowSteps: MockChatStep[] = [
       connCall(5, 6),
       connCall(5, 7),
       connCall(5, 8),
-      stageCall('review', 'Outputs connected — <strong>report, notify, dashboard</strong>. Your workflow is mapped.'),
+      stageCall('current_state_5', 'Outputs connected — <strong>report, notify, dashboard</strong>. Your workflow is mapped.'),
     ],
     commentary: "Outputs connected — <strong>report, notify, dashboard</strong>. Your workflow is mapped.",
   },

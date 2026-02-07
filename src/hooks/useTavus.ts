@@ -2,10 +2,18 @@
 
 import { useState, useRef, useCallback, useEffect } from 'react'
 
+interface UseTavusProfile {
+  name?: string
+  role?: string
+  industry?: string
+  painPoints?: string[]
+}
+
 interface UseTavusOptions {
   replicaId?: string
   personaId?: string
   avatarName?: string
+  profile?: UseTavusProfile
 }
 
 export function useTavus(options?: UseTavusOptions) {
@@ -44,6 +52,8 @@ export function useTavus(options?: UseTavusOptions) {
           replicaId: options?.replicaId,
           personaId: options?.personaId,
           conversationName: `Session with ${options?.avatarName || 'Avatar'}`,
+          avatarName: options?.avatarName,
+          profile: options?.profile,
         }),
       })
 
@@ -65,7 +75,7 @@ export function useTavus(options?: UseTavusOptions) {
       isLoadingRef.current = false
       setIsLoading(false)
     }
-  }, [options?.replicaId, options?.personaId, options?.avatarName])
+  }, [options?.replicaId, options?.personaId, options?.avatarName, options?.profile])
 
   /**
    * Send text for the avatar to speak — routed through our API to keep API key server-side

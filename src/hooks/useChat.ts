@@ -4,11 +4,11 @@ import { useCallback, useRef } from 'react'
 import { useConversationStore } from '@/stores/conversation.store'
 import { useWorkflowStore } from '@/stores/workflow.store'
 import { useInterviewStore } from '@/stores/interview.store'
-import type { AvatarKey, InterviewStage, WorkflowNodeType } from '@/lib/types'
+import type { AvatarKey, InterviewStage } from '@/lib/types'
 
 interface UseChatOptions {
   onAssistantResponse?: (text: string) => void
-  generateNodeImage?: (nodeId: string, label: string, description: string | undefined, type: WorkflowNodeType) => void
+  onToolAction?: (action: { type: string; payload: Record<string, unknown> }) => void
 }
 
 export function useChat(avatarKey: AvatarKey, options?: UseChatOptions) {
@@ -44,17 +44,16 @@ export function useChat(avatarKey: AvatarKey, options?: UseChatOptions) {
           const nodeId = toolInput.id as string
           const nodeLabel = toolInput.label as string
           const nodeType = toolInput.type as 'source' | 'processor' | 'decision' | 'output' | 'ai'
-          const nodeDesc = toolInput.description as string | undefined
           addNode({
             id: nodeId,
             label: nodeLabel,
             type: nodeType,
-            icon: (toolInput.icon as string) || '📦',
-            description: nodeDesc,
+            icon: (toolInput.icon as string) || '',
+            description: toolInput.description as string | undefined,
           })
           setTimeout(() => revealNode(nodeId), 300)
-          // Fire-and-forget: generate AI image for this node
-          optionsRef.current?.generateNodeImage?.(nodeId, nodeLabel, nodeDesc, nodeType)
+          // Notify session page via onToolAction
+          optionsRef.current?.onToolAction?.({ type: 'add_workflow_node', payload: toolInput })
           break
         }
         case 'add_workflow_connection': {
@@ -73,6 +72,8 @@ export function useChat(avatarKey: AvatarKey, options?: UseChatOptions) {
             setCommentary(toolInput.commentary as string)
             setTimeout(() => clearCommentary(), 4000)
           }
+          // Notify session page via onToolAction
+          optionsRef.current?.onToolAction?.({ type: 'update_interview_stage', payload: toolInput })
           break
         }
         case 'extract_user_context': {
@@ -84,6 +85,14 @@ export function useChat(avatarKey: AvatarKey, options?: UseChatOptions) {
             painPoints: toolInput.pain_points as string[] | undefined,
             currentTools: toolInput.current_tools as string[] | undefined,
           })
+          break
+        }
+        case 'generate_state_image': {
+          optionsRef.current?.onToolAction?.({ type: 'generate_state_image', payload: toolInput })
+          break
+        }
+        case 'request_validation': {
+          optionsRef.current?.onToolAction?.({ type: 'request_validation', payload: toolInput })
           break
         }
       }
@@ -119,7 +128,7 @@ export function useChat(avatarKey: AvatarKey, options?: UseChatOptions) {
           try {
             const event = JSON.parse(line)
 
-            // ── Text deltas ──
+            // -- Text deltas --
             if (event.type === 'content_block_delta') {
               if (event.delta?.type === 'text_delta') {
                 fullText += event.delta.text
@@ -131,7 +140,7 @@ export function useChat(avatarKey: AvatarKey, options?: UseChatOptions) {
               }
             }
 
-            // ── Tool call starting ──
+            // -- Tool call starting --
             if (event.type === 'content_block_start') {
               if (event.content_block?.type === 'tool_use') {
                 currentToolName = event.content_block.name || ''
@@ -139,7 +148,7 @@ export function useChat(avatarKey: AvatarKey, options?: UseChatOptions) {
               }
             }
 
-            // ── Content block stop → dispatch tool call if we have one ──
+            // -- Content block stop -> dispatch tool call if we have one --
             if (event.type === 'content_block_stop') {
               if (currentToolName && currentToolInput) {
                 try {
@@ -153,18 +162,18 @@ export function useChat(avatarKey: AvatarKey, options?: UseChatOptions) {
               }
             }
 
-            // ── Mock suggestions (custom event) ──
+            // -- Mock suggestions (custom event) --
             if (event.type === 'mock_suggestions') {
               setSuggestions(event.suggestions || [])
             }
 
-            // ── Mock commentary (custom event) ──
+            // -- Mock commentary (custom event) --
             if (event.type === 'mock_commentary') {
               setCommentary(event.commentary || '')
               setTimeout(() => clearCommentary(), 4000)
             }
 
-            // ── Errors ──
+            // -- Errors --
             if (event.type === 'error') {
               console.error('Stream error:', event.error)
             }
@@ -187,7 +196,7 @@ export function useChat(avatarKey: AvatarKey, options?: UseChatOptions) {
       // Add user message (with optional image)
       addMessage({ role: 'user', content: userMessage, imageUrl })
 
-      // Build the new user message content — multimodal if image attached
+      // Build the new user message content -- multimodal if image attached
       let newUserContent: string | Array<Record<string, unknown>> = userMessage
       if (imageUrl) {
         // Extract base64 data and media type from data URL
@@ -218,7 +227,12 @@ export function useChat(avatarKey: AvatarKey, options?: UseChatOptions) {
         const response = await fetch('/api/chat', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ messages: history, avatarKey, profile: profileRef.current }),
+          body: JSON.stringify({
+            messages: history,
+            avatarKey,
+            profile: profileRef.current,
+            interviewStage: useConversationStore.getState().interviewStage,
+          }),
           signal: abortRef.current.signal,
         })
 
@@ -252,7 +266,7 @@ export function useChat(avatarKey: AvatarKey, options?: UseChatOptions) {
     [avatarKey, messages, addMessage, setStreaming, setCurrentStreamingText, setSuggestions, processStream]
   )
 
-  // Send initial greeting — uses onboarding profile data if available
+  // Send initial greeting -- uses onboarding profile data if available
   const sendGreeting = useCallback(async () => {
     setSuggestions([])
     setStreaming(true)
@@ -278,6 +292,7 @@ export function useChat(avatarKey: AvatarKey, options?: UseChatOptions) {
           messages: [{ role: 'user', content: greetingMsg }],
           avatarKey,
           profile: profileRef.current,
+          interviewStage: useConversationStore.getState().interviewStage,
         }),
       })
 

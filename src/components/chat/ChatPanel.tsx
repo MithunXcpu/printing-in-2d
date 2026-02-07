@@ -1,6 +1,7 @@
 'use client'
 
 import { useRef, useEffect } from 'react'
+import Image from 'next/image'
 import { MessageBubble } from './MessageBubble'
 import { TypingIndicator } from './TypingIndicator'
 import { ChatInput } from './ChatInput'
@@ -61,9 +62,11 @@ export function ChatPanel({ avatar, onSendMessage, disabled, avatarSlot, callCon
               boxShadow: `0 0 0 3px ${avatar.color}66, 0 0 24px ${avatar.color}33, 0 4px 20px rgba(0,0,0,.4)`,
             }}
           >
-            <img
+            <Image
               src={avatar.photoUrl}
               alt={avatar.name}
+              width={80}
+              height={80}
               className="w-full h-full object-cover"
             />
           </div>

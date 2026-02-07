@@ -50,6 +50,18 @@ export function TavusAvatar({ avatar, onConnected, onError, onSpeak }: TavusAvat
     }
   }, [isConnected, speak])
 
+  // 15-second connection timeout — fall back to GenerativeAvatar
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      if (!isConnected && !error) {
+        onErrorRef.current?.('Connection timeout — falling back to 3D avatar')
+      }
+    }, 15000)
+
+    if (isConnected || error) clearTimeout(timer)
+    return () => clearTimeout(timer)
+  }, [isConnected, error])
+
   // Notify parent of errors
   useEffect(() => {
     if (error) {

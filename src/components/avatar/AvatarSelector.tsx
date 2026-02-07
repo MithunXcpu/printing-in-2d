@@ -11,7 +11,7 @@ interface AvatarSelectorProps {
 
 export function AvatarSelector({ onSelect }: AvatarSelectorProps) {
   return (
-    <div className="flex flex-col items-center gap-14 px-10 py-12">
+    <div className="flex flex-col items-center gap-12 px-6 sm:px-10 py-12 w-full max-w-[1040px] mx-auto">
       <div className="text-center">
         <motion.div
           initial={{ opacity: 0 }}
@@ -26,7 +26,7 @@ export function AvatarSelector({ onSelect }: AvatarSelectorProps) {
             color: 'var(--green-400)',
           }}
         >
-          Step 1 of 5 — Choose your guide
+          Choose your co-builder
         </motion.div>
         <motion.h1
           initial={{ opacity: 0, y: 16 }}
@@ -35,27 +35,27 @@ export function AvatarSelector({ onSelect }: AvatarSelectorProps) {
           className="mb-3"
           style={{
             fontFamily: 'var(--font-fraunces), Fraunces, serif',
-            fontSize: 'clamp(2rem, 4.5vw, 3.4rem)',
+            fontSize: 'clamp(2rem, 4.5vw, 3.2rem)',
             letterSpacing: '-0.03em',
           }}
         >
-          Who should{' '}
+          Four minds,{' '}
           <em className="italic font-light text-gradient">
-            build with you?
+            one mission
           </em>
         </motion.h1>
         <motion.p
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.5, delay: 0.2 }}
-          className="font-light mx-auto leading-relaxed max-w-[500px]"
-          style={{ fontSize: '1.05rem', color: 'var(--ink-20)' }}
+          className="font-light mx-auto leading-relaxed max-w-[480px]"
+          style={{ fontSize: '1rem', color: 'var(--ink-20)' }}
         >
-          Each avatar has a different approach to understanding your problem and designing your micro tool.
+          Each guide thinks differently about your problem. Pick the style that fits how you work.
         </motion.p>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 max-w-[960px] w-full">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 w-full">
         {Object.values(AVATAR_PERSONALITIES).map((avatar, index) => (
           <AvatarCard
             key={avatar.key}

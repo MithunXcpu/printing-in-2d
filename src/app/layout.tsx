@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import { ClerkProvider } from '@clerk/nextjs'
 import { dark } from '@clerk/themes'
 import { Outfit, Fraunces, JetBrains_Mono } from 'next/font/google'
+import { Toaster } from 'sonner'
 import './globals.css'
 
 const outfit = Outfit({
@@ -50,6 +51,18 @@ export default function RootLayout({
       <body className={`${outfit.variable} ${fraunces.variable} ${jetbrainsMono.variable} antialiased`}>
         <div className="texture" />
         {children}
+        <Toaster
+          position="bottom-right"
+          toastOptions={{
+            style: {
+              background: 'rgba(20, 26, 14, 0.95)',
+              border: '1px solid rgba(255,255,255,.08)',
+              color: '#fafcf8',
+              backdropFilter: 'blur(16px)',
+              fontFamily: 'var(--font-outfit)',
+            },
+          }}
+        />
       </body>
     </html>
   )

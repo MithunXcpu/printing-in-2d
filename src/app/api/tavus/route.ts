@@ -6,15 +6,25 @@ function hasTavusKey(): boolean {
 }
 
 export async function POST(request: Request) {
-  const { replicaId, personaId, conversationName } = (await request.json()) as {
+  const { replicaId, personaId, conversationName, avatarName, profile } = (await request.json()) as {
     replicaId?: string
     personaId?: string
     conversationName?: string
+    avatarName?: string
+    profile?: { name?: string; role?: string; industry?: string; painPoints?: string[] }
   }
 
   if (!hasTavusKey()) {
     return new Response('Tavus not configured', { status: 503 })
   }
+
+  // Build rich context from profile data
+  const profileContext = profile?.name ? `The user's name is ${profile.name}.` : ''
+  const roleContext = profile?.role ? ` They are a ${profile.role}${profile.industry ? ` in ${profile.industry}` : ''}.` : ''
+  const painContext = profile?.painPoints?.[0] ? ` Their main challenge: ${profile.painPoints[0]}.` : ''
+  const avatarContext = avatarName ? `You are ${avatarName}, an AI co-builder.` : ''
+
+  const conversationalContext = `${avatarContext} ${profileContext}${roleContext}${painContext} You are a silent video avatar. Do NOT speak on your own. Only speak when explicitly given text via the injection API. Never initiate conversation. Be warm and professional.`
 
   try {
     // Create a Tavus conversation session
@@ -29,8 +39,7 @@ export async function POST(request: Request) {
         ...(personaId ? { persona_id: personaId } : {}),
         conversation_name: conversationName || 'Printing in 2D Session',
         // Disable Tavus's built-in conversational AI — we control speech via speak() endpoint
-        conversational_context:
-          'You are a silent video avatar. Do NOT speak on your own. Only speak when explicitly given text via the injection API. Never initiate conversation.',
+        conversational_context: conversationalContext,
         // custom_greeting omitted entirely to disable Tavus auto-greeting
         properties: {
           max_call_duration: 1800, // 30 minutes max

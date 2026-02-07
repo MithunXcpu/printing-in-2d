@@ -1,6 +1,7 @@
 'use client'
 
 import Link from 'next/link'
+import { ArrowLeft } from 'lucide-react'
 import { AuthButtons } from '@/components/auth/AuthButtons'
 import { PhaseProgress } from '@/components/layout/PhaseProgress'
 
@@ -29,29 +30,53 @@ export function TopBar({
         borderBottom: `1px solid ${avatarColor ? avatarColor + '15' : 'rgba(255,255,255,.04)'}`,
       }}
     >
-      <Link href="/build" className="flex items-center gap-2.5 no-underline text-white group">
-        <div
-          className="w-7 h-7 rounded-[7px] relative flex items-center justify-center transition-transform duration-300 group-hover:scale-105"
-          style={{ background: 'var(--green-400)' }}
-        >
-          <span className="block w-[13px] h-[2px] bg-white rounded-sm" style={{ boxShadow: '0 4px 0 #fff, 0 -4px 0 #fff' }} />
-          {/* Online dot */}
-          <span
-            className="absolute -top-0.5 -right-0.5 w-2 h-2 rounded-full"
-            style={{
-              background: 'var(--green-300)',
-              border: '1.5px solid var(--ink)',
-              animation: 'onlinePulse 3s ease-in-out infinite',
-            }}
-          />
-        </div>
-        <span
-          className="transition-colors duration-200"
-          style={{ fontFamily: 'var(--font-fraunces), Fraunces, serif', fontWeight: 600, fontSize: '0.92rem' }}
-        >
-          Printing in 2D
-        </span>
-      </Link>
+      <div className="flex items-center gap-2.5">
+        {showBack && onBack ? (
+          <button
+            onClick={onBack}
+            className="flex items-center gap-2 no-underline text-white cursor-pointer transition-opacity duration-200 hover:opacity-80"
+            style={{ background: 'none', border: 'none', padding: 0 }}
+          >
+            <div
+              className="w-7 h-7 rounded-full flex items-center justify-center transition-transform duration-300 hover:scale-105"
+              style={{ background: 'rgba(255,255,255,.08)', border: '1px solid rgba(255,255,255,.1)' }}
+            >
+              <ArrowLeft size={14} style={{ color: 'var(--green-300)' }} />
+            </div>
+            <span
+              className="transition-colors duration-200"
+              style={{ fontFamily: 'var(--font-fraunces), Fraunces, serif', fontWeight: 600, fontSize: '0.92rem' }}
+            >
+              Printing in 2D
+            </span>
+          </button>
+        ) : (
+          <Link href="/build" className="flex items-center gap-2.5 no-underline text-white group">
+            <span
+              className="transition-colors duration-200"
+              style={{
+                fontFamily: 'var(--font-fraunces), Fraunces, serif',
+                fontWeight: 600,
+                fontSize: '0.92rem',
+                color: 'var(--green-300)',
+              }}
+            >
+              P2D
+            </span>
+            <span
+              className="transition-colors duration-200 hidden sm:inline"
+              style={{
+                fontFamily: 'var(--font-outfit), Outfit, sans-serif',
+                fontWeight: 400,
+                fontSize: '0.82rem',
+                color: 'rgba(255,255,255,.45)',
+              }}
+            >
+              Printing in 2D
+            </span>
+          </Link>
+        )}
+      </div>
 
       {/* Center: phase progress or text status */}
       {showPhases ? (
@@ -70,19 +95,6 @@ export function TopBar({
       )}
 
       <div className="flex items-center gap-3">
-        {showBack && (
-          <button
-            onClick={onBack}
-            className="px-4 py-1.5 rounded-full text-sm cursor-pointer transition-all duration-200 hover:text-white hover:border-white/20 glass"
-            style={{
-              color: 'rgba(255,255,255,.5)',
-              fontFamily: 'var(--font-outfit), Outfit, sans-serif',
-              fontSize: '0.78rem',
-            }}
-          >
-            Start Over
-          </button>
-        )}
         <AuthButtons />
       </div>
     </div>

@@ -18,7 +18,7 @@ export const AVATAR_PERSONALITIES: Record<string, AvatarPersonality> = {
     modelUrl: 'https://models.readyplayer.me/6460d95f9ae8cb350c14e7d4.glb?morphTargets=ARKit,Oculus+Visemes',
     modelBody: 'M',
     // Tavus: Benjamin — professional, authoritative Black male
-    tavusReplicaId: 'r5c3a5978cb9',
+    tavusReplicaId: 'r1a4e22fa0d9',
     tavusPersonaId: undefined,
   },
   spark: {
@@ -78,7 +78,7 @@ export const AVATAR_PERSONALITIES: Record<string, AvatarPersonality> = {
     modelUrl: 'https://models.readyplayer.me/6460d95f9ae8cb350c14e7d4.glb?morphTargets=ARKit,Oculus+Visemes',
     modelBody: 'F',
     // Tavus: Anna — calm, patient female
-    tavusReplicaId: 'rbe81aa309b5',
+    tavusReplicaId: 'r6ae5b6efc9d',
     tavusPersonaId: undefined,
   },
 }

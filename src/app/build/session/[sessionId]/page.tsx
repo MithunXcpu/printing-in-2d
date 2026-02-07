@@ -10,7 +10,7 @@ import { WorkflowDiagram } from '@/components/diagram/WorkflowDiagram'
 import { StateImageViewer } from '@/components/state/StateImageViewer'
 import { InterruptButton } from '@/components/ui/InterruptButton'
 import { useChat } from '@/hooks/useChat'
-import { useSpeechSynthesis } from '@/hooks/useSpeechSynthesis'
+// useSpeechSynthesis removed — Tavus handles all voice
 import { useSpeechRecognition } from '@/hooks/useSpeechRecognition'
 import { useScreenCapture } from '@/hooks/useScreenCapture'
 import { CallControls } from '@/components/chat/CallControls'
@@ -25,12 +25,6 @@ type ViewMode = 'chat' | 'current_image' | 'future_image' | 'compare' | 'refine'
 // Dynamic import TavusAvatar -- only loads when needed, no SSR
 const TavusAvatar = dynamic(
   () => import('@/components/avatar/TavusAvatar').then((m) => ({ default: m.TavusAvatar })),
-  { ssr: false }
-)
-
-// Dynamic import GenerativeAvatar (3D TalkingHead) -- fallback when Tavus is unavailable
-const GenerativeAvatar = dynamic(
-  () => import('@/components/avatar/GenerativeAvatar').then((m) => ({ default: m.GenerativeAvatar })),
   { ssr: false }
 )
 
@@ -61,12 +55,7 @@ export default function SessionPage() {
   const [tavusFailed, setTavusFailed] = useState(false)
   const tavusSpeakRef = useRef<((text: string) => Promise<void>) | null>(null)
 
-  // Generative 3D avatar state
-  const [generativeConnected, setGenerativeConnected] = useState(false)
-  const generativeSpeakRef = useRef<((text: string) => void) | null>(null)
-
-  // ElevenLabs / browser TTS -- disabled when Tavus handles audio
-  const { speak: speakTTS } = useSpeechSynthesis({ disabled: tavusConnected })
+  // No browser TTS — Tavus handles all speech
 
   // Speech recognition (mic input) -- sends transcript as a chat message
   const sendMessageRef = useRef<((msg: string) => void) | null>(null)
@@ -78,22 +67,15 @@ export default function SessionPage() {
   // Screen capture (screenshots + recording)
   const { takeScreenshot, startRecording, stopRecording, isCapturing, isRecording, stopCapture } = useScreenCapture()
 
-  // Speech routing: Tavus -> Generative 3D -> ElevenLabs -> Browser TTS
+  // Speech routing: Tavus only — video avatar handles both video + audio
   const onAssistantResponse = useCallback(
     (text: string) => {
       if (tavusConnected && tavusSpeakRef.current) {
-        // Tavus handles both video + audio
         tavusSpeakRef.current(text)
-      } else if (generativeConnected && generativeSpeakRef.current) {
-        // 3D avatar handles lip-sync from text -- also play audio via TTS
-        generativeSpeakRef.current(text)
-        speakTTS(text, avatar?.voiceId)
-      } else {
-        // ElevenLabs (or browser TTS fallback)
-        speakTTS(text, avatar?.voiceId)
       }
+      // If Tavus isn't connected, text still shows in chat — no fallback voice
     },
-    [tavusConnected, generativeConnected, speakTTS, avatar?.voiceId]
+    [tavusConnected]
   )
 
   // Tool action handler -- responds to tool calls from useChat
@@ -208,20 +190,6 @@ export default function SessionPage() {
     tavusSpeakRef.current = speakFn
   }, [])
 
-  // Generative 3D avatar callbacks
-  const handleGenerativeConnected = useCallback(() => {
-    setGenerativeConnected(true)
-  }, [])
-
-  const handleGenerativeError = useCallback(() => {
-    setGenerativeConnected(false)
-    generativeSpeakRef.current = null
-  }, [])
-
-  const handleGenerativeSpeak = useCallback((speakFn: (text: string) => void) => {
-    generativeSpeakRef.current = speakFn
-  }, [])
-
   // Store sendGreeting in a ref to avoid dependency issues
   const sendGreetingRef = useRef(sendGreeting)
   sendGreetingRef.current = sendGreeting
@@ -254,22 +222,13 @@ export default function SessionPage() {
 
   if (!avatar) return null
 
-  // Determine which avatar to render:
-  // 1. Try Tavus first (if it hasn't failed)
-  // 2. Fall back to GenerativeAvatar (3D) if Tavus fails
-  const avatarSlotElement = !tavusFailed ? (
+  // Tavus video avatar — no fallback to 3D or Mac voice
+  const avatarSlotElement = (
     <TavusAvatar
       avatar={avatar}
       onConnected={handleTavusConnected}
       onError={handleTavusError}
       onSpeak={handleTavusSpeak}
-    />
-  ) : (
-    <GenerativeAvatar
-      avatar={avatar}
-      onConnected={handleGenerativeConnected}
-      onError={handleGenerativeError}
-      onSpeak={handleGenerativeSpeak}
     />
   )
 

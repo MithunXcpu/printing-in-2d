@@ -245,9 +245,9 @@ export function useChat(avatarKey: AvatarKey, options?: UseChatOptions) {
 
         const fullText = await processStream(reader, abortRef.current.signal)
 
-        // Finalize the assistant message
+        // Always add the assistant message — tool-only responses still need a visible entry
+        addMessage({ role: 'assistant', content: fullText || '' })
         if (fullText) {
-          addMessage({ role: 'assistant', content: fullText })
           optionsRef.current?.onAssistantResponse?.(fullText)
         }
       } catch (error) {
@@ -303,8 +303,9 @@ export function useChat(avatarKey: AvatarKey, options?: UseChatOptions) {
 
       const fullText = await processStream(reader)
 
+      // Always add the assistant message — even if tool-only (no text)
+      addMessage({ role: 'assistant', content: fullText || '' })
       if (fullText) {
-        addMessage({ role: 'assistant', content: fullText })
         optionsRef.current?.onAssistantResponse?.(fullText)
       }
     } catch (error) {

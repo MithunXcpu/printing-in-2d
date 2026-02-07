@@ -3,7 +3,7 @@ import { getSystemPrompt } from '@/lib/system-prompts'
 import { WORKFLOW_TOOLS } from '@/lib/tool-definitions'
 import { isMockMode } from '@/lib/mock-mode'
 import { MOCK_CONVERSATIONS } from '@/lib/mock-conversations'
-import type { AvatarKey, InterviewStage } from '@/lib/types'
+import type { AvatarKey } from '@/lib/types'
 
 function createMockStream(
   messages: Array<{ role: string; content: string | Array<Record<string, unknown>> }>,
@@ -102,11 +102,10 @@ function createMockStream(
 }
 
 export async function POST(request: Request) {
-  const { messages, avatarKey, profile, interviewStage } = (await request.json()) as {
+  const { messages, avatarKey, profile } = (await request.json()) as {
     messages: Array<{ role: 'user' | 'assistant'; content: string | Array<Record<string, unknown>> }>
     avatarKey: AvatarKey
     profile?: import('@/lib/types').UserProfile
-    interviewStage?: InterviewStage
   }
 
   // ── Mock mode: no API key needed ──
@@ -125,22 +124,15 @@ export async function POST(request: Request) {
   const anthropic = new Anthropic()
   const systemPrompt = getSystemPrompt(avatarKey, profile)
 
-  // Determine whether to force tool calls based on interview stage
-  const stage = interviewStage || 'current_state_1'
-  const forceTools =
-    stage.startsWith('current_state') ||
-    stage.startsWith('future_state') ||
-    stage.startsWith('generate_') ||
-    stage.startsWith('validate_')
-
-  // Cast messages to the Anthropic SDK's expected type
-  // Messages with multimodal content (image + text) are already in the correct format
+  // Always use tool_choice: auto — the system prompt already strongly
+  // instructs the model to call tools in every response. Using 'any' can
+  // cause tool-only responses with no text, which breaks the chat display.
   const stream = anthropic.messages.stream({
     model: 'claude-sonnet-4-20250514',
     max_tokens: 2048,
     system: systemPrompt,
     tools: WORKFLOW_TOOLS,
-    tool_choice: forceTools ? { type: 'any' } : { type: 'auto' },
+    tool_choice: { type: 'auto' },
     messages: messages as Anthropic.MessageParam[],
   })
 

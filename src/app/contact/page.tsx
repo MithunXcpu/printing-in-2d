@@ -56,7 +56,7 @@ export default function ContactPage() {
 
           {/* Form */}
           <form
-            action="https://formspree.io/f/xplaceholder"
+            action="https://formspree.io/f/xnjbjvng"
             method="POST"
             className="space-y-5 glass p-8 rounded-3xl"
             style={{ borderRadius: "var(--radius-xl)" }}

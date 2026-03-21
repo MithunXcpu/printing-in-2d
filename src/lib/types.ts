@@ -19,7 +19,7 @@ export type InterviewStage =
   | 'refine'
   | 'orchestrate'
 
-export type WorkflowNodeType = 'source' | 'processor' | 'decision' | 'output' | 'ai'
+export type WorkflowNodeType = 'source' | 'processor' | 'decision' | 'output' | 'ai' | 'trigger' | 'api' | 'database' | 'notification' | 'transform' | 'display' | 'storage'
 
 export interface WorkflowNode {
   id: string
@@ -50,6 +50,8 @@ export interface Message {
   /** Base64 data URL for a generated state image */
   stateImageUrl?: string
   toolCalls?: ToolCall[]
+  /** When true, message is in API history but hidden from the chat UI */
+  hidden?: boolean
   timestamp: number
 }
 
@@ -102,6 +104,56 @@ export interface UserProfile {
   painPoints: string[]
   currentTools: string[]
   dataSources: string[]
+}
+
+// ── Agent Swarm Types ─────────────────────────────────────────────────────
+
+export type AgentId =
+  | 'frontend' | 'backend' | 'database' | 'auth' | 'ai-llm' | 'integration'
+  | 'data-pipeline' | 'deployment' | 'testing' | 'security' | 'ux-design'
+  | 'documentation' | 'cost-infra' | 'project-manager' | 'devops'
+
+export type AgentStatus = 'idle' | 'queued' | 'analyzing' | 'complete' | 'error'
+
+export type AgentCategory = 'build' | 'ops' | 'strategy'
+
+export interface AgentDefinition {
+  id: AgentId
+  name: string
+  icon: string
+  description: string
+  category: AgentCategory
+  freeTier: boolean
+  avatarKey: AvatarKey
+  systemPrompt: string
+}
+
+export interface AgentCodeSnippet {
+  filename: string
+  language: string
+  code: string
+  description: string
+}
+
+export interface AgentResult {
+  agentId: AgentId
+  status: AgentStatus
+  analysis: string
+  codeSnippets: AgentCodeSnippet[]
+  recommendations: string[]
+  relevantNodeIds: string[]
+  estimatedHours?: number
+  imageDescription?: string
+  imageUrl?: string
+  error?: string
+}
+
+export interface SwarmInput {
+  nodes: WorkflowNode[]
+  connections: WorkflowConnection[]
+  profile: UserProfile
+  workOrders: WorkOrder[]
+  agentIds: AgentId[]
 }
 
 export type SessionPhase = 'selection' | 'discover' | 'design' | 'blueprint' | 'build' | 'validate'

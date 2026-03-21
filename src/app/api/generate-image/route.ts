@@ -18,6 +18,13 @@ function buildPrompt(label: string, description: string | undefined, type: Workf
     decision: 'decision logic, branching, conditional routing, AI classification',
     output: 'output delivery, report generation, dashboard display, notification, email',
     ai: 'artificial intelligence, machine learning, neural network, AI processing',
+    trigger: 'webhook, schedule, cron job, event trigger, automation start',
+    api: 'REST API, external service call, HTTP request, third-party integration',
+    database: 'database query, data lookup, SQL, read/write records',
+    notification: 'alert, email, SMS, Slack message, push notification',
+    transform: 'data mapping, conversion, aggregation, ETL, format change',
+    display: 'dashboard, UI component, visualization, chart, report view',
+    storage: 'file storage, cloud bucket, S3, document archive, backup',
   }
   const hint = typeHint[type] || 'technology'
   const desc = description ? ` — ${description}` : ''

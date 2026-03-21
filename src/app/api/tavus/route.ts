@@ -6,11 +6,12 @@ function hasTavusKey(): boolean {
 }
 
 export async function POST(request: Request) {
-  const { replicaId, personaId, conversationName, avatarName, profile } = (await request.json()) as {
+  const { replicaId, personaId, conversationName, avatarName, participantName, profile } = (await request.json()) as {
     replicaId?: string
     personaId?: string
     conversationName?: string
     avatarName?: string
+    participantName?: string
     profile?: { name?: string; role?: string; industry?: string; painPoints?: string[] }
   }
 
@@ -41,6 +42,8 @@ export async function POST(request: Request) {
         // Disable Tavus's built-in conversational AI — we control speech via speak() endpoint
         conversational_context: conversationalContext,
         // custom_greeting omitted entirely to disable Tavus auto-greeting
+        // Pass participant name to skip Tavus's "Enter your name" dialog
+        ...(participantName || profile?.name ? { participant_name: participantName || profile?.name } : {}),
         properties: {
           max_call_duration: 1800, // 30 minutes max
           enable_recording: false,

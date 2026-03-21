@@ -41,7 +41,7 @@ export function TopBar({
               className="w-7 h-7 rounded-full flex items-center justify-center transition-transform duration-300 hover:scale-105"
               style={{ background: 'rgba(255,255,255,.08)', border: '1px solid rgba(255,255,255,.1)' }}
             >
-              <ArrowLeft size={14} style={{ color: 'var(--green-300)' }} />
+              <ArrowLeft size={14} style={{ color: avatarColor || 'var(--green-300)' }} />
             </div>
             <span
               className="transition-colors duration-200"
@@ -52,24 +52,20 @@ export function TopBar({
           </button>
         ) : (
           <Link href="/build" className="flex items-center gap-2.5 no-underline text-white group">
-            <span
-              className="transition-colors duration-200"
-              style={{
-                fontFamily: 'var(--font-fraunces), Fraunces, serif',
-                fontWeight: 600,
-                fontSize: '0.92rem',
-                color: 'var(--green-300)',
-              }}
-            >
-              P2D
-            </span>
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" style={{ flexShrink: 0 }}>
+              <rect x="3" y="3" width="18" height="18" rx="3" stroke={avatarColor || 'var(--green-300)'} strokeWidth="1.5" fill="none" />
+              <rect x="7" y="7" width="4" height="4" rx="1" fill={avatarColor || 'var(--green-300)'} opacity="0.6" />
+              <rect x="13" y="7" width="4" height="4" rx="1" fill={avatarColor || 'var(--green-300)'} opacity="0.4" />
+              <rect x="7" y="13" width="4" height="4" rx="1" fill={avatarColor || 'var(--green-300)'} opacity="0.4" />
+              <rect x="13" y="13" width="4" height="4" rx="1" fill={avatarColor || 'var(--green-300)'} opacity="0.8" />
+            </svg>
             <span
               className="transition-colors duration-200 hidden sm:inline"
               style={{
-                fontFamily: 'var(--font-outfit), Outfit, sans-serif',
-                fontWeight: 400,
-                fontSize: '0.82rem',
-                color: 'rgba(255,255,255,.45)',
+                fontFamily: 'var(--font-fraunces), Fraunces, serif',
+                fontWeight: 600,
+                fontSize: '0.88rem',
+                color: 'rgba(255,255,255,.55)',
               }}
             >
               Printing in 2D

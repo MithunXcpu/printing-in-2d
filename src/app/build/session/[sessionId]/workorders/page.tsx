@@ -920,6 +920,50 @@ export default function WorkOrdersPage() {
                   >
                     {totalOrders} work orders &middot; {Object.values(generatedCodes).reduce((sum, c) => sum + c.split('\n').length, 0)} lines generated
                   </p>
+
+                  {/* Auto-navigate to Agent Swarm */}
+                  <button
+                    onClick={() => router.push(`/build/session/${sessionId}/swarm`)}
+                    className="group mt-4 px-10 py-4 rounded-full font-semibold text-white transition-all hover:translate-y-[-2px] hover:brightness-110 flex items-center gap-3"
+                    style={{
+                      background: avatar.color,
+                      fontSize: '0.95rem',
+                      fontFamily: 'var(--font-outfit), Outfit, sans-serif',
+                      boxShadow: `0 8px 32px ${avatar.glow}`,
+                    }}
+                  >
+                    <svg
+                      width="20"
+                      height="20"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      className="transition-transform group-hover:scale-110"
+                    >
+                      <circle cx="12" cy="12" r="3" />
+                      <circle cx="4" cy="6" r="2" />
+                      <circle cx="20" cy="6" r="2" />
+                      <circle cx="4" cy="18" r="2" />
+                      <circle cx="20" cy="18" r="2" />
+                      <line x1="9.5" y1="10.5" x2="5.5" y2="7.5" />
+                      <line x1="14.5" y1="10.5" x2="18.5" y2="7.5" />
+                      <line x1="9.5" y1="13.5" x2="5.5" y2="16.5" />
+                      <line x1="14.5" y1="13.5" x2="18.5" y2="16.5" />
+                    </svg>
+                    Deploy Agent Swarm
+                  </button>
+                  <p
+                    className="text-center max-w-md"
+                    style={{
+                      fontFamily: 'var(--font-jetbrains-mono), JetBrains Mono, monospace',
+                      fontSize: '0.6rem',
+                      color: 'rgba(255,255,255,.2)',
+                      lineHeight: '1.6',
+                    }}
+                  >
+                    15 specialized AI agents will analyze your workflow from every angle — frontend, backend, security, cost, and more.
+                  </p>
                 </div>
               )}
             </div>

@@ -1,3 +1,7 @@
+import { AVAILABLE_ICON_NAMES } from './node-icons'
+
+const iconList = AVAILABLE_ICON_NAMES.join(', ')
+
 export const WORKFLOW_TOOLS = [
   {
     name: 'add_workflow_node',
@@ -5,10 +9,17 @@ export const WORKFLOW_TOOLS = [
     input_schema: {
       type: 'object' as const,
       properties: {
-        id: { type: 'string', description: 'Unique snake_case identifier (e.g. "excel_upload", "ai_classify", "slack_notify")' },
-        label: { type: 'string', description: 'Short display label, 2-4 words (e.g. "Excel Upload", "AI Classify")' },
-        type: { type: 'string', enum: ['source', 'processor', 'decision', 'output', 'ai'], description: 'source=data input/file/API, processor=transformation/calculation, decision=branching/condition, output=report/notification/destination, ai=AI/ML processing step' },
-        icon: { type: 'string', description: 'Optional emoji or Lucide icon name representing this node (e.g. "FileSpreadsheet", "Bot", "Mail", or emoji like 📊, 🤖, 📧)' },
+        id: { type: 'string', description: 'Unique snake_case identifier (e.g. "excel_upload", "weather_api", "compare_data")' },
+        label: { type: 'string', description: 'Short display label, 2-4 words (e.g. "Excel Upload", "Weather API", "Compare Data")' },
+        type: {
+          type: 'string',
+          enum: ['source', 'processor', 'decision', 'output', 'ai', 'trigger', 'api', 'database', 'notification', 'transform', 'display', 'storage'],
+          description: 'source=data input/file, processor=transformation/calculation, decision=branching/condition, output=report/export, ai=AI/ML processing, trigger=webhook/schedule/event, api=external API call, database=database read/write, notification=alert/email/SMS, transform=data mapping/conversion, display=dashboard/UI/visualization, storage=file/cloud storage',
+        },
+        icon: {
+          type: 'string',
+          description: `Lucide icon name that best represents this node. Pick the most specific match. Available: ${iconList}`,
+        },
         description: { type: 'string', description: 'One sentence describing what this node does in the workflow' },
       },
       required: ['id', 'label', 'type', 'icon', 'description'],
@@ -25,6 +36,31 @@ export const WORKFLOW_TOOLS = [
         label: { type: 'string', description: 'Short label describing what flows between nodes (e.g. "raw CSV", "cleaned data", "if approved")' },
       },
       required: ['from', 'to'],
+    },
+  },
+  {
+    name: 'update_workflow_node',
+    description: 'Update an existing node on the diagram. Use this when the user wants to change a node label, icon, or description.',
+    input_schema: {
+      type: 'object' as const,
+      properties: {
+        id: { type: 'string', description: 'The node id to update' },
+        label: { type: 'string', description: 'New label (optional)' },
+        icon: { type: 'string', description: 'New Lucide icon name (optional)' },
+        description: { type: 'string', description: 'New description (optional)' },
+      },
+      required: ['id'],
+    },
+  },
+  {
+    name: 'remove_workflow_node',
+    description: 'Remove a node from the diagram and all its connections. Use this when the user says to delete or remove a step.',
+    input_schema: {
+      type: 'object' as const,
+      properties: {
+        id: { type: 'string', description: 'The node id to remove' },
+      },
+      required: ['id'],
     },
   },
   {

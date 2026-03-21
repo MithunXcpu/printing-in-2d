@@ -6,9 +6,10 @@ import type { Message } from '@/lib/types'
 interface MessageBubbleProps {
   message: Message
   avatarColor?: string
+  avatarName?: string
 }
 
-export function MessageBubble({ message, avatarColor }: MessageBubbleProps) {
+export function MessageBubble({ message, avatarColor, avatarName }: MessageBubbleProps) {
   if (message.role === 'system') {
     return (
       <div
@@ -60,7 +61,7 @@ export function MessageBubble({ message, avatarColor }: MessageBubbleProps) {
             color: avatarColor || 'var(--green-300)',
           }}
         >
-          AI
+          {avatarName || 'AI'}
         </div>
       )}
       {message.imageUrl && (

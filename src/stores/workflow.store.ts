@@ -1,6 +1,6 @@
 import { create } from 'zustand'
 import type { WorkflowNode, WorkflowConnection, WorkflowNodeType } from '@/lib/types'
-import { calculateNodePosition } from '@/lib/workflow-layout'
+import { calculateNodePosition, calculateSmartLayout } from '@/lib/workflow-layout'
 
 interface Commentary {
   text: string
@@ -11,11 +11,16 @@ interface WorkflowState {
   nodes: WorkflowNode[]
   connections: WorkflowConnection[]
   commentary: Commentary | null
+  selectedNodeId: string | null
 
   addNode: (node: Omit<WorkflowNode, 'x' | 'y' | 'isRevealed'>) => void
   revealNode: (nodeId: string) => void
   addConnection: (conn: { from: string; to: string; label?: string }) => void
   revealConnection: (connId: string) => void
+  updateNode: (nodeId: string, updates: Partial<Pick<WorkflowNode, 'label' | 'icon' | 'description'>>) => void
+  deleteNode: (nodeId: string) => void
+  selectNode: (nodeId: string | null) => void
+  relayoutAll: () => void
   setCommentary: (text: string) => void
   clearCommentary: () => void
   updateNodeImage: (nodeId: string, imageUrl: string) => void
@@ -29,6 +34,7 @@ export const useWorkflowStore = create<WorkflowState>((set, get) => ({
   nodes: [],
   connections: [],
   commentary: null,
+  selectedNodeId: null,
 
   addNode: (node) =>
     set((state) => {
@@ -73,7 +79,13 @@ export const useWorkflowStore = create<WorkflowState>((set, get) => ({
         { id, from: conn.from, to: conn.to, label: conn.label, isRevealed: false },
       ],
     }))
-    // Auto-reveal connection after delay (gives nodes time to reveal first)
+
+    // Relayout after adding a connection
+    setTimeout(() => {
+      get().relayoutAll()
+    }, 100)
+
+    // Auto-reveal connection after delay
     setTimeout(() => {
       const state = get()
       const fromNode = state.nodes.find((n) => n.id === conn.from)
@@ -95,6 +107,39 @@ export const useWorkflowStore = create<WorkflowState>((set, get) => ({
       ),
     })),
 
+  updateNode: (nodeId, updates) =>
+    set((state) => ({
+      nodes: state.nodes.map((n) =>
+        n.id === nodeId ? { ...n, ...updates } : n
+      ),
+    })),
+
+  deleteNode: (nodeId) =>
+    set((state) => ({
+      nodes: state.nodes.filter((n) => n.id !== nodeId),
+      connections: state.connections.filter((c) => c.from !== nodeId && c.to !== nodeId),
+      selectedNodeId: state.selectedNodeId === nodeId ? null : state.selectedNodeId,
+    })),
+
+  selectNode: (nodeId) => set({ selectedNodeId: nodeId }),
+
+  relayoutAll: () => {
+    const state = get()
+    const revealedNodes = state.nodes.filter(n => n.isRevealed)
+    const revealedConnections = state.connections.filter(c => c.isRevealed)
+
+    if (revealedNodes.length < 2 || revealedConnections.length === 0) return
+
+    const newPositions = calculateSmartLayout(revealedNodes, revealedConnections)
+    set({
+      nodes: state.nodes.map((n) => {
+        const pos = newPositions.get(n.id)
+        if (pos) return { ...n, x: pos.x, y: pos.y }
+        return n
+      }),
+    })
+  },
+
   setCommentary: (text) => set({ commentary: { text, visible: true } }),
   clearCommentary: () => set({ commentary: null }),
 
@@ -110,6 +155,6 @@ export const useWorkflowStore = create<WorkflowState>((set, get) => ({
 
   reset: () => {
     connCounter = 0
-    set({ nodes: [], connections: [], commentary: null })
+    set({ nodes: [], connections: [], commentary: null, selectedNodeId: null })
   },
 }))

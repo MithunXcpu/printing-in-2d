@@ -226,6 +226,7 @@ export default function SessionPage() {
   const avatarSlotElement = (
     <TavusAvatar
       avatar={avatar}
+      participantName={profile?.name}
       onConnected={handleTavusConnected}
       onError={handleTavusError}
       onSpeak={handleTavusSpeak}

@@ -4,7 +4,7 @@ import { useCallback, useRef } from 'react'
 import { useConversationStore } from '@/stores/conversation.store'
 import { useWorkflowStore } from '@/stores/workflow.store'
 import { useInterviewStore } from '@/stores/interview.store'
-import type { AvatarKey, InterviewStage } from '@/lib/types'
+import type { AvatarKey, InterviewStage, WorkflowNodeType } from '@/lib/types'
 
 interface UseChatOptions {
   onAssistantResponse?: (text: string) => void
@@ -31,6 +31,8 @@ export function useChat(avatarKey: AvatarKey, options?: UseChatOptions) {
   const addConnection = useWorkflowStore((s) => s.addConnection)
   const setCommentary = useWorkflowStore((s) => s.setCommentary)
   const clearCommentary = useWorkflowStore((s) => s.clearCommentary)
+  const updateNodeStore = useWorkflowStore((s) => s.updateNode)
+  const deleteNodeStore = useWorkflowStore((s) => s.deleteNode)
 
   const updateProfile = useInterviewStore((s) => s.updateProfile)
   const setStage = useInterviewStore((s) => s.setStage)
@@ -43,7 +45,7 @@ export function useChat(avatarKey: AvatarKey, options?: UseChatOptions) {
         case 'add_workflow_node': {
           const nodeId = toolInput.id as string
           const nodeLabel = toolInput.label as string
-          const nodeType = toolInput.type as 'source' | 'processor' | 'decision' | 'output' | 'ai'
+          const nodeType = toolInput.type as WorkflowNodeType
           addNode({
             id: nodeId,
             label: nodeLabel,
@@ -95,9 +97,21 @@ export function useChat(avatarKey: AvatarKey, options?: UseChatOptions) {
           optionsRef.current?.onToolAction?.({ type: 'request_validation', payload: toolInput })
           break
         }
+        case 'update_workflow_node': {
+          updateNodeStore(toolInput.id as string, {
+            label: toolInput.label as string | undefined,
+            icon: toolInput.icon as string | undefined,
+            description: toolInput.description as string | undefined,
+          })
+          break
+        }
+        case 'remove_workflow_node': {
+          deleteNodeStore(toolInput.id as string)
+          break
+        }
       }
     },
-    [addNode, revealNode, addConnection, setCommentary, clearCommentary, setInterviewStage, setStage, updateProfile]
+    [addNode, revealNode, addConnection, setCommentary, clearCommentary, setInterviewStage, setStage, updateProfile, updateNodeStore, deleteNodeStore]
   )
 
   /**
@@ -269,8 +283,6 @@ export function useChat(avatarKey: AvatarKey, options?: UseChatOptions) {
   // Send initial greeting -- uses onboarding profile data if available
   const sendGreeting = useCallback(async () => {
     setSuggestions([])
-    setStreaming(true)
-    setCurrentStreamingText('')
 
     // Build a contextual greeting that includes what the user told us during onboarding
     const p = profileRef.current
@@ -283,6 +295,12 @@ export function useChat(avatarKey: AvatarKey, options?: UseChatOptions) {
       if (p.desiredOutcomes?.[0]) parts.push(`What I want: ${p.desiredOutcomes[0]}`)
       greetingMsg = parts.join(' ')
     }
+
+    // Store the greeting so conversation history stays in sync (hidden from chat UI)
+    addMessage({ role: 'user', content: greetingMsg, hidden: true })
+
+    setStreaming(true)
+    setCurrentStreamingText('')
 
     try {
       const response = await fetch('/api/chat', {

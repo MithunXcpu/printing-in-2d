@@ -13,6 +13,7 @@ interface UseTavusOptions {
   replicaId?: string
   personaId?: string
   avatarName?: string
+  participantName?: string
   profile?: UseTavusProfile
 }
 
@@ -53,6 +54,7 @@ export function useTavus(options?: UseTavusOptions) {
           personaId: options?.personaId,
           conversationName: `Session with ${options?.avatarName || 'Avatar'}`,
           avatarName: options?.avatarName,
+          participantName: options?.participantName,
           profile: options?.profile,
         }),
       })
@@ -75,7 +77,7 @@ export function useTavus(options?: UseTavusOptions) {
       isLoadingRef.current = false
       setIsLoading(false)
     }
-  }, [options?.replicaId, options?.personaId, options?.avatarName, options?.profile])
+  }, [options?.replicaId, options?.personaId, options?.avatarName, options?.participantName, options?.profile])
 
   /**
    * Send text for the avatar to speak — routed through our API to keep API key server-side

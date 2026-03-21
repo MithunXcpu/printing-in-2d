@@ -47,76 +47,45 @@ export function ChatPanel({ avatar, onSendMessage, disabled, avatarSlot, callCon
       {/* Tavus video avatar slot — renders above header when present */}
       {avatarSlot}
 
-      {/* Avatar hero + header */}
-      {!avatarSlot && avatar.photoUrl ? (
+      {/* Avatar header — compact inline bar */}
+      {!avatarSlot && (
         <div
-          className="flex flex-col items-center py-6 px-6"
-          style={{
-            borderBottom: '1px solid rgba(255,255,255,.04)',
-            background: `radial-gradient(ellipse at 50% 80%, ${avatar.glow}, transparent 70%)`,
-          }}
-        >
-          <div
-            className="w-20 h-20 rounded-full overflow-hidden mb-3"
-            style={{
-              boxShadow: `0 0 0 3px ${avatar.color}66, 0 0 24px ${avatar.color}33, 0 4px 20px rgba(0,0,0,.4)`,
-            }}
-          >
-            <Image
-              src={avatar.photoUrl}
-              alt={avatar.name}
-              width={80}
-              height={80}
-              className="w-full h-full object-cover"
-            />
-          </div>
-          <h3
-            className="text-white mb-0.5"
-            style={{ fontFamily: 'var(--font-fraunces), Fraunces, serif', fontSize: '1.1rem', fontWeight: 600 }}
-          >
-            {avatar.name}
-          </h3>
-          <div className="flex items-center gap-1.5">
-            <div
-              className="w-1.5 h-1.5 rounded-full"
-              style={{
-                background: avatar.color,
-                animation: 'onlinePulse 2s ease-in-out infinite',
-                '--avatar-color': avatar.color,
-              } as React.CSSProperties}
-            />
-            <span
-              style={{
-                fontSize: '0.68rem',
-                color: 'var(--ink-20)',
-                fontFamily: 'var(--font-jetbrains-mono), JetBrains Mono, monospace',
-              }}
-            >
-              {avatar.trait.split('.')[0]}
-            </span>
-          </div>
-        </div>
-      ) : !avatarSlot ? (
-        <div
-          className="px-6 py-5 flex items-center gap-3.5"
+          className="px-5 py-3.5 flex items-center gap-3"
           style={{ borderBottom: '1px solid rgba(255,255,255,.04)' }}
         >
-          <div
-            className="w-10 h-10 rounded-full flex items-center justify-center text-xl flex-shrink-0"
-            style={{ background: avatar.gradient }}
-          >
-            {avatar.emoji}
-          </div>
-          <div className="flex-1">
+          {avatar.photoUrl ? (
+            <div
+              className="w-9 h-9 rounded-full overflow-hidden flex-shrink-0"
+              style={{
+                boxShadow: `0 0 0 2px ${avatar.color}40`,
+              }}
+            >
+              <Image
+                src={avatar.photoUrl}
+                alt={avatar.name}
+                width={36}
+                height={36}
+                className="w-full h-full object-cover"
+              />
+            </div>
+          ) : (
+            <div
+              className="w-9 h-9 rounded-full flex items-center justify-center text-lg flex-shrink-0"
+              style={{ background: avatar.gradient }}
+            >
+              {avatar.emoji}
+            </div>
+          )}
+          <div className="flex-1 min-w-0">
             <h3
               className="text-white"
-              style={{ fontFamily: 'var(--font-fraunces), Fraunces, serif', fontSize: '1rem', fontWeight: 600 }}
+              style={{ fontFamily: 'var(--font-fraunces), Fraunces, serif', fontSize: '0.95rem', fontWeight: 600 }}
             >
               {avatar.name}
             </h3>
             <span
               style={{
-                fontSize: '0.72rem',
+                fontSize: '0.65rem',
                 color: 'var(--ink-20)',
                 fontFamily: 'var(--font-jetbrains-mono), JetBrains Mono, monospace',
               }}
@@ -125,21 +94,17 @@ export function ChatPanel({ avatar, onSendMessage, disabled, avatarSlot, callCon
             </span>
           </div>
           <div
-            className="w-2 h-2 rounded-full ml-auto"
-            style={{
-              background: avatar.color,
-              animation: 'onlinePulse 2s ease-in-out infinite',
-              '--avatar-color': avatar.color,
-            } as React.CSSProperties}
+            className="w-1.5 h-1.5 rounded-full ml-auto flex-shrink-0"
+            style={{ background: avatar.color }}
           />
         </div>
-      ) : null}
+      )}
 
-      {/* Gradient separator between header and messages */}
+      {/* Subtle separator */}
       <div
         style={{
-          height: '2px',
-          background: `linear-gradient(to right, ${avatar.senderColor}, transparent)`,
+          height: '1px',
+          background: `linear-gradient(to right, ${avatar.color}30, transparent)`,
           flexShrink: 0,
         }}
       />
@@ -149,8 +114,8 @@ export function ChatPanel({ avatar, onSendMessage, disabled, avatarSlot, callCon
         className="flex-1 overflow-y-auto px-6 py-5 flex flex-col gap-3"
         style={{ scrollBehavior: 'smooth' }}
       >
-        {messages.map((msg) => (
-          <MessageBubble key={msg.id} message={msg} avatarColor={avatar.senderColor} />
+        {messages.filter((msg) => !msg.hidden).map((msg) => (
+          <MessageBubble key={msg.id} message={msg} avatarColor={avatar.senderColor} avatarName={avatar.name} />
         ))}
 
         {isStreaming && currentStreamingText && (

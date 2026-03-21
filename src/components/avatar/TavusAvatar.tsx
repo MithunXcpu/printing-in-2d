@@ -7,12 +7,13 @@ import type { AvatarPersonality } from '@/lib/types'
 
 interface TavusAvatarProps {
   avatar: AvatarPersonality
+  participantName?: string
   onConnected?: () => void
   onError?: (error: string) => void
   onSpeak?: (speak: (text: string) => Promise<void>) => void
 }
 
-export function TavusAvatar({ avatar, onConnected, onError, onSpeak }: TavusAvatarProps) {
+export function TavusAvatar({ avatar, participantName, onConnected, onError, onSpeak }: TavusAvatarProps) {
   const {
     isConnected,
     isLoading,
@@ -24,6 +25,7 @@ export function TavusAvatar({ avatar, onConnected, onError, onSpeak }: TavusAvat
     replicaId: avatar.tavusReplicaId,
     personaId: avatar.tavusPersonaId,
     avatarName: avatar.name,
+    participantName,
   })
 
   // Use refs for callbacks to avoid re-triggering effects

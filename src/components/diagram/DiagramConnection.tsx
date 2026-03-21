@@ -28,7 +28,6 @@ export function DiagramConnection({ connection, nodes, avatarColor = '#2d8014' }
   // Measure whenever the component mounts/updates and on resize
   useEffect(() => {
     measure()
-    // Also measure after a small delay in case layout isn't ready
     const t1 = setTimeout(measure, 100)
     const t2 = setTimeout(measure, 500)
     window.addEventListener('resize', measure)
@@ -63,37 +62,34 @@ export function DiagramConnection({ connection, nodes, avatarColor = '#2d8014' }
         fill="none"
         stroke={avatarColor}
         strokeWidth="4"
-        opacity="0.15"
-        style={{ filter: 'blur(3px)' }}
+        opacity="0.12"
+        style={{ filter: 'blur(4px)' }}
       />
-      {/* Main dashed line */}
+      {/* Main solid line */}
       <path
         d={path}
         fill="none"
         stroke={avatarColor}
         strokeWidth="1.5"
-        strokeDasharray="8 5"
-        opacity="0.5"
+        opacity="0.6"
+        markerEnd="url(#arrowhead)"
         style={{
-          strokeDashoffset: 100,
-          animation: 'dashDraw 1s ease forwards',
+          strokeDasharray: 1000,
+          strokeDashoffset: 1000,
+          animation: 'connDraw 0.8s ease forwards',
         }}
       />
-      {/* Arrowhead dot at endpoint */}
-      <circle
-        cx={x2}
-        cy={y2}
-        r="3"
-        fill={avatarColor}
-        opacity="0.6"
-      />
+      {/* Animated flowing dot */}
+      <circle r="2.5" fill={avatarColor} opacity="0.8">
+        <animateMotion dur="3s" repeatCount="indefinite" path={path} />
+      </circle>
       {/* Connection label */}
       {connection.label && (
         <text
           x={(x1 + x2) / 2}
-          y={(y1 + y2) / 2 - 8}
+          y={(y1 + y2) / 2 - 10}
           textAnchor="middle"
-          fill="rgba(255,255,255,0.35)"
+          fill="rgba(255,255,255,0.4)"
           fontSize="9"
           fontFamily="var(--font-jetbrains-mono), JetBrains Mono, monospace"
         >

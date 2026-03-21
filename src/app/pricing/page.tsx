@@ -30,6 +30,8 @@ const plans = [
       'Unlimited sessions',
       'All 4 AI avatars',
       'Live video avatars (Tavus)',
+      '15 specialized build agents',
+      'Full code generation',
       'Voice input & screen share',
       'AI image generation',
       'Session history & resume',

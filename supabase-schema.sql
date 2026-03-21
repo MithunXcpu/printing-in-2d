@@ -103,8 +103,29 @@ create policy "Connections belong to session" on workflow_connections for all us
 create policy "Profiles belong to session" on interview_profiles for all using (true);
 create policy "Work orders belong to session" on work_orders for all using (true);
 
+-- Swarm results (agent analysis output per session)
+create table if not exists swarm_results (
+  id uuid primary key default gen_random_uuid(),
+  session_id uuid references sessions(id) on delete cascade,
+  agent_id text not null,
+  status text default 'pending',        -- idle | queued | analyzing | complete | error
+  analysis text,
+  code_snippets jsonb default '[]',
+  recommendations jsonb default '[]',
+  relevant_node_ids jsonb default '[]',
+  estimated_hours float,
+  error text,
+  created_at timestamptz default now(),
+  updated_at timestamptz default now()
+);
+
+alter table swarm_results enable row level security;
+create policy "Swarm results belong to session" on swarm_results for all using (true);
+
 -- Indexes for common queries
 create index if not exists idx_sessions_user_id on sessions(user_id);
 create index if not exists idx_messages_session_id on messages(session_id);
 create index if not exists idx_workflow_nodes_session_id on workflow_nodes(session_id);
 create index if not exists idx_workflow_connections_session_id on workflow_connections(session_id);
+create index if not exists idx_swarm_results_session_id on swarm_results(session_id);
+create index if not exists idx_swarm_results_agent on swarm_results(session_id, agent_id);

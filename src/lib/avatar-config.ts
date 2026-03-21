@@ -5,7 +5,7 @@ export const AVATAR_PERSONALITIES: Record<string, AvatarPersonality> = {
     key: 'oracle',
     name: 'Oracle',
     emoji: '\u{1F9E0}',
-    // photoUrl removed — Tavus replica is the visual identity now
+    photoUrl: '/avatars/oracle.jpg',
     trait: 'Strategic & analytical. Asks the hard questions. Has opinions.',
     tags: ['Industry patterns', 'Opinionated', 'Pushes back'],
     color: '#2d8014',
@@ -25,7 +25,7 @@ export const AVATAR_PERSONALITIES: Record<string, AvatarPersonality> = {
     key: 'spark',
     name: 'Spark',
     emoji: '\u26A1',
-    // photoUrl removed — Tavus replica is the visual identity now
+    photoUrl: '/avatars/spark.jpg',
     trait: 'Creative & lateral. Sees connections nobody else does.',
     tags: ['What-if scenarios', 'Pattern finder', 'Lateral'],
     color: '#d97706',
@@ -45,7 +45,7 @@ export const AVATAR_PERSONALITIES: Record<string, AvatarPersonality> = {
     key: 'forge',
     name: 'Forge',
     emoji: '\u{1F528}',
-    // photoUrl removed — Tavus replica is the visual identity now
+    photoUrl: '/avatars/forge.jpg',
     trait: 'Direct & no-nonsense. Ships fast. Cuts the waste.',
     tags: ['No fluff', 'Fast decisions', 'Ship it'],
     color: '#6366f1',
@@ -65,7 +65,7 @@ export const AVATAR_PERSONALITIES: Record<string, AvatarPersonality> = {
     key: 'flow',
     name: 'Flow',
     emoji: '\u{1F30A}',
-    // photoUrl removed — Tavus replica is the visual identity now
+    photoUrl: '/avatars/flow.jpg',
     trait: 'Patient & thorough. Takes it step by step. Nothing missed.',
     tags: ['Step by step', 'Calm guidance', 'Thorough'],
     color: '#06b6d4',

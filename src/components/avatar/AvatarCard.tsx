@@ -1,15 +1,8 @@
 'use client'
 
+import Image from 'next/image'
 import { motion } from 'framer-motion'
-import { Brain, Zap, Hammer, Waves } from 'lucide-react'
 import type { AvatarPersonality } from '@/lib/types'
-
-const AVATAR_ICONS: Record<string, React.ComponentType<{ size?: number; className?: string; color?: string }>> = {
-  oracle: Brain,
-  spark: Zap,
-  forge: Hammer,
-  flow: Waves,
-}
 
 interface AvatarCardProps {
   avatar: AvatarPersonality
@@ -18,8 +11,6 @@ interface AvatarCardProps {
 }
 
 export function AvatarCard({ avatar, index, onClick }: AvatarCardProps) {
-  const Icon = AVATAR_ICONS[avatar.key] || Brain
-
   return (
     <motion.div
       initial={{ opacity: 0, y: 28 }}
@@ -50,16 +41,30 @@ export function AvatarCard({ avatar, index, onClick }: AvatarCardProps) {
       />
 
       <div className="px-6 pt-7 pb-6">
-        {/* Icon + Name row */}
+        {/* Avatar photo + Name */}
         <div className="flex items-center gap-3 mb-4 relative z-10">
           <div
-            className="w-10 h-10 rounded-xl flex items-center justify-center transition-transform duration-500 group-hover:scale-110"
+            className="w-12 h-12 rounded-full overflow-hidden flex-shrink-0 transition-transform duration-500 group-hover:scale-110"
             style={{
-              background: `${avatar.color}18`,
-              border: `1px solid ${avatar.color}30`,
+              boxShadow: `0 0 0 2px ${avatar.color}50, 0 0 20px ${avatar.glow}`,
             }}
           >
-            <Icon size={20} color={avatar.color} />
+            {avatar.photoUrl ? (
+              <Image
+                src={avatar.photoUrl}
+                alt={avatar.name}
+                width={48}
+                height={48}
+                className="w-full h-full object-cover"
+              />
+            ) : (
+              <div
+                className="w-full h-full flex items-center justify-center text-xl"
+                style={{ background: avatar.gradient }}
+              >
+                {avatar.emoji}
+              </div>
+            )}
           </div>
           <div>
             <div
@@ -105,7 +110,7 @@ export function AvatarCard({ avatar, index, onClick }: AvatarCardProps) {
           ))}
         </div>
 
-        {/* Select button — always visible, subtle, amplifies on hover */}
+        {/* Select button */}
         <motion.button
           className="w-full py-2.5 rounded-xl font-medium transition-all duration-300 relative z-10"
           style={{

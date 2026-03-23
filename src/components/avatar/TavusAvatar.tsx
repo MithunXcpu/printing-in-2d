@@ -19,6 +19,7 @@ export function TavusAvatar({ avatar, participantName, onConnected, onError, onS
     isLoading,
     error,
     initialize,
+    retry,
     speak,
     conversationUrl,
   } = useTavus({
@@ -137,15 +138,37 @@ export function TavusAvatar({ avatar, participantName, onConnected, onError, onS
           )}
         </div>
         {error && (
-          <span
-            style={{
-              fontSize: '0.65rem',
-              color: 'rgba(255,255,255,.35)',
-              fontFamily: 'var(--font-jetbrains-mono), JetBrains Mono, monospace',
-            }}
-          >
-            Video unavailable
-          </span>
+          <div className="flex flex-col items-center gap-1">
+            <span
+              style={{
+                fontSize: '0.65rem',
+                color: 'rgba(255,255,255,.35)',
+                fontFamily: 'var(--font-jetbrains-mono), JetBrains Mono, monospace',
+              }}
+            >
+              Video unavailable
+            </span>
+            <button
+              onClick={() => retry()}
+              style={{
+                fontSize: '0.6rem',
+                color: avatar.color,
+                background: 'none',
+                border: `1px solid ${avatar.color}44`,
+                borderRadius: '4px',
+                padding: '2px 10px',
+                cursor: 'pointer',
+                fontFamily: 'var(--font-jetbrains-mono), JetBrains Mono, monospace',
+                letterSpacing: '0.04em',
+                opacity: 0.8,
+                transition: 'opacity 0.2s',
+              }}
+              onMouseOver={(e) => (e.currentTarget.style.opacity = '1')}
+              onMouseOut={(e) => (e.currentTarget.style.opacity = '0.8')}
+            >
+              click to retry
+            </button>
+          </div>
         )}
       </div>
     )

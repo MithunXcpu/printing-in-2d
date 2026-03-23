@@ -38,6 +38,9 @@ export const useWorkflowStore = create<WorkflowState>((set, get) => ({
 
   addNode: (node) =>
     set((state) => {
+      if (state.nodes.some(n => n.id === node.id)) {
+        return state  // Skip duplicate
+      }
       const existingOfType = state.nodes.filter((n) => n.type === node.type)
       const position = calculateNodePosition(node.type as WorkflowNodeType, existingOfType.length)
       return {

@@ -54,10 +54,17 @@ export async function POST(request: Request) {
     })
 
     if (!response.ok) {
-      const error = await response.text()
-      console.error('Tavus API error:', response.status, error)
+      const errorBody = await response.text()
+      console.error('[Tavus API] Create conversation failed:', {
+        status: response.status,
+        statusText: response.statusText,
+        body: errorBody,
+        replicaId,
+        personaId,
+        headers: Object.fromEntries(response.headers.entries()),
+      })
       return Response.json(
-        { error: 'Failed to create Tavus session' },
+        { error: `Tavus error ${response.status}: ${errorBody || 'Failed to create session'}` },
         { status: 502 }
       )
     }
@@ -69,9 +76,15 @@ export async function POST(request: Request) {
       conversationUrl: data.conversation_url,
     })
   } catch (error) {
-    console.error('Tavus session error:', error)
+    console.error('[Tavus API] Session creation exception:', {
+      message: (error as Error).message,
+      name: (error as Error).name,
+      stack: (error as Error).stack,
+      replicaId,
+      personaId,
+    })
     return Response.json(
-      { error: 'Failed to create Tavus session' },
+      { error: `Tavus session error: ${(error as Error).message}` },
       { status: 500 }
     )
   }

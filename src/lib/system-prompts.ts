@@ -170,6 +170,7 @@ Your tool calls:
 - After all 5 current-state questions: MUST call generate_state_image + request_validation
 - After all 5 future-state questions: MUST call generate_state_image + request_validation
 - After both validations: move to compare → refine → orchestrate
+- Do NOT call add_workflow_node for items you already added in a previous response. Each workflow node should only be added once. If you already created a node (e.g. "salesforce_data"), do NOT add it again — reference it by ID instead.
 `
 
 function buildOnboardingContext(profile?: UserProfile): string {

@@ -61,6 +61,12 @@ export function useTavus(options?: UseTavusOptions) {
 
       if (!response.ok) {
         const text = await response.text()
+        console.error('[useTavus] API response error:', {
+          status: response.status,
+          statusText: response.statusText,
+          body: text,
+          url: response.url,
+        })
         throw new Error(text || 'Tavus not available')
       }
 
@@ -71,13 +77,35 @@ export function useTavus(options?: UseTavusOptions) {
       isConnectedRef.current = true
       setIsConnected(true)
     } catch (err) {
-      console.error('Tavus initialization failed:', err)
+      console.error('[useTavus] Initialization failed:', err)
+      console.error('[useTavus] Error details:', {
+        message: (err as Error).message,
+        name: (err as Error).name,
+        stack: (err as Error).stack,
+      })
       setError((err as Error).message)
     } finally {
       isLoadingRef.current = false
       setIsLoading(false)
     }
   }, [options?.replicaId, options?.personaId, options?.avatarName, options?.participantName, options?.profile])
+
+  /**
+   * Retry after a failed connection — resets error state and re-initializes
+   */
+  const retry = useCallback(async () => {
+    // Reset guards so initialize() can run again
+    isConnectedRef.current = false
+    isLoadingRef.current = false
+    conversationIdRef.current = null
+    setIsConnected(false)
+    setConversationId(null)
+    setConversationUrl(null)
+    setError(null)
+
+    // Re-run initialization
+    await initialize()
+  }, [initialize])
 
   /**
    * Send text for the avatar to speak — routed through our API to keep API key server-side
@@ -148,6 +176,7 @@ export function useTavus(options?: UseTavusOptions) {
     conversationId,
     conversationUrl,
     initialize,
+    retry,
     speak,
     disconnect,
   }

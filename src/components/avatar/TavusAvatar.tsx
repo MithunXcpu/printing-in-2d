@@ -22,6 +22,7 @@ export function TavusAvatar({ avatar, participantName, onConnected, onError, onS
     retry,
     speak,
     conversationUrl,
+    setTavusError,
   } = useTavus({
     replicaId: avatar.tavusReplicaId,
     personaId: avatar.tavusPersonaId,
@@ -53,17 +54,18 @@ export function TavusAvatar({ avatar, participantName, onConnected, onError, onS
     }
   }, [isConnected, speak])
 
-  // 30-second connection timeout
+  // 30-second connection timeout — sets error so retry button appears
   useEffect(() => {
     const timer = setTimeout(() => {
       if (!isConnected && !error) {
+        setTavusError('Connection timeout')
         onErrorRef.current?.('Connection timeout')
       }
     }, 30000)
 
     if (isConnected || error) clearTimeout(timer)
     return () => clearTimeout(timer)
-  }, [isConnected, error])
+  }, [isConnected, error, setTavusError])
 
   // Notify parent of errors
   useEffect(() => {

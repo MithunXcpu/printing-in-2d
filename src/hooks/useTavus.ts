@@ -67,7 +67,14 @@ export function useTavus(options?: UseTavusOptions) {
           body: text,
           url: response.url,
         })
-        throw new Error(text || 'Tavus not available')
+        let message = 'Tavus not available'
+        try {
+          const parsed = JSON.parse(text)
+          if (parsed.error) message = parsed.error
+        } catch {
+          if (text) message = text
+        }
+        throw new Error(message)
       }
 
       const data = await response.json()
@@ -179,5 +186,6 @@ export function useTavus(options?: UseTavusOptions) {
     retry,
     speak,
     disconnect,
+    setTavusError: setError,
   }
 }
